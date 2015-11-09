@@ -11,6 +11,8 @@ See http://foxglovesecurity.com/2015/11/06/what-do-weblogic-websphere-jboss-jenk
  
 invoker-defender makes some well known vulnerable classes non-serializable by rewriting their byte code when the class loads.
 
+Trying to deserialize to a non-serializable class will result in an InvalidClassException.
+
 ## Usage
 
 Add the following parameter to your Java startup script:
