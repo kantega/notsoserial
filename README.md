@@ -27,7 +27,7 @@ Copy this as invoker-defender.jar to your application, and add the following par
 > PLEASE NOTE: In this case, invoker-defender only does blocks a few known vulnerabilities. It does not fix the problem with deserialization attacks. It only knowns about some well known classes for which it rejects deserialization. See below how you can whitelist or completely reject any objects to be deserialized.
 
 
-## Which classes are unserialized?
+## Which classes are rejected?
 
 By default, invoker-defender unserializes the following classes:
 
