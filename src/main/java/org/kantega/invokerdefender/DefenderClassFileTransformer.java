@@ -21,7 +21,6 @@ public class DefenderClassFileTransformer implements ClassFileTransformer {
         unserialized.add(internalName("org.​apache.​commons.​collections4.​functors.​InvokerTransformer"));
         unserialized.add(internalName("org.​codehaus.​groovy.​runtime.​ConvertedClosure"));
         unserialized.add(internalName("com.​sun.​org.​apache.​xalan.​internal.​xsltc.​trax.​TemplatesImpl"));
-        unserialized.add(internalName("org.​apache.​commons.​collections.​Transformer"));
         String classes = System.getProperty("invoker.defender.custom.classes");
         if(classes != null) {
             for (String className : classes.split(",")) {

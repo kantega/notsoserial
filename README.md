@@ -33,7 +33,6 @@ By default, invoker-defender unserializes the following classes:
 * org.apache.commons.collections4.functors.InvokerTransformer
 * org.codehaus.groovy.runtime.ConvertedClosure
 * com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl
-* org.apache.commons.collections.Transformer
 
 You can add your own classes to this list by passing a comma-separated list of classes as a system property:
 
