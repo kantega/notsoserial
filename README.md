@@ -5,6 +5,8 @@ invoker-defender is a Java Agent designed as a mitigation effort against deseria
 
 See http://foxglovesecurity.com/2015/11/06/what-do-weblogic-websphere-jboss-jenkins-opennms-and-your-application-have-in-common-this-vulnerability/ for details on this attack.
 
+> Please note: invoker-defender only does what it does. It does not fix the problem with deserialization attacks. It only knowns about and unserializes some well known classes. It cannot protect you from deserializing other vulnerable classes.
+
 ## How?
  
 invoker-defender makes some well known vulnerable classes non-serializable by rewriting their byte code when the class loads.
