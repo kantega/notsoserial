@@ -10,30 +10,31 @@ import java.lang.instrument.IllegalClassFormatException;
 import java.security.ProtectionDomain;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 /**
  *
  */
 public class DefenderClassFileTransformer implements ClassFileTransformer {
 
-    public static final Set<String> unserialized = new HashSet<String>();
+    public static final Set<String> blacklist = new HashSet<String>();
 
     private static Set<String> whiteList = null;
 
     private static PrintWriter dryRunWriter = null;
 
-    private static Set<String> deserializingClasses = new HashSet<String>();
+    private static Set<String> deserializingClasses = new ConcurrentSkipListSet<String>();
 
     static {
-        unserialized.add(internalName("org.apache.commons.collections.functors.InvokerTransformer"));
-        unserialized.add(internalName("org.apache.commons.collections4.functors.InvokerTransformer"));
-        unserialized.add(internalName("org.codehaus.groovy.​runtime.​ConvertedClosure"));
-        unserialized.add(internalName("com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl"));
+        blacklist.add(internalName("org.apache.commons.collections.functors.InvokerTransformer"));
+        blacklist.add(internalName("org.apache.commons.collections4.functors.InvokerTransformer"));
+        blacklist.add(internalName("org.codehaus.groovy.​runtime.​ConvertedClosure"));
+        blacklist.add(internalName("com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl"));
         String classes = System.getProperty("invoker.defender.custom.classes");
         if(classes != null) {
             for (String className : classes.split(",")) {
                 className = className.trim();
-                unserialized.add(className);
+                blacklist.add(className);
             }
         }
 
@@ -94,7 +95,7 @@ public class DefenderClassFileTransformer implements ClassFileTransformer {
     }
 
     public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
-        if(shouldUnserialize(className, loader, classfileBuffer)) {
+        if(shouldUnserialize(className, classfileBuffer)) {
             ClassReader reader = new ClassReader(classfileBuffer);
             ClassWriter writer = new ClassWriter(0);
             String onReadObjectCallbackMethod = dryRunWriter != null ? "registerDeserialization" : "preventDeserialization";
@@ -116,10 +117,10 @@ public class DefenderClassFileTransformer implements ClassFileTransformer {
 
 
     public static void preventDeserialization(String className) {
-        throw new IllegalStateException("Deserialization not allowed for class " +className.replace('/','.'));
+        throw new UnsupportedOperationException("Deserialization not allowed for class " +className.replace('/','.'));
     }
 
-    private boolean shouldUnserialize(String className, ClassLoader loader, byte[] classfileBuffer) {
+    private boolean shouldUnserialize(String className, byte[] classfileBuffer) {
         if(className == null || classfileBuffer == null) {
             return false;
         }
@@ -132,7 +133,7 @@ public class DefenderClassFileTransformer implements ClassFileTransformer {
             }
             return true;
         } else {
-            return unserialized.contains(className);
+            return blacklist.contains(className);
         }
     }
 }

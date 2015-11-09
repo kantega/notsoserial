@@ -39,7 +39,7 @@ public class InvokerDefenderWithAgentIT {
         } catch (ClassCastException e) {
             // Ignore, happens after exploit effect
 
-        } catch (IllegalStateException e) {
+        } catch (UnsupportedOperationException e) {
             // The object should not be deserializable
             System.out.println();
         }

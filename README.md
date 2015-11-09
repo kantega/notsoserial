@@ -7,7 +7,7 @@ See http://foxglovesecurity.com/2015/11/06/what-do-weblogic-websphere-jboss-jenk
 
 ## How?
  
-invoker-defender makes some well known vulnerable classes effectively non-deserializable by rewriting their byte code when the class loads. It does so by adding a readObject (or modify an existing readObject) to throw an IllegalArgumentException when a deserialization attempt is made.
+invoker-defender makes some well known vulnerable classes effectively non-deserializable by rewriting their byte code when the class loads. It does so by adding a readObject (or modify an existing readObject) to throw an UnsupportedOperationException when a deserialization attempt is made.
 
 ## Usage
 
@@ -58,7 +58,7 @@ After you are confident that all deserializable classes in your application have
 
 An Exception will be thrown, looking something like this:
 
-    java.lang.IllegalStateException: Deserialization not allowed for class java.util.concurrent.locks.AbstractOwnableSynchronizer
+    java.lang.UnsupportedOperationException: Deserialization not allowed for class java.util.concurrent.locks.AbstractOwnableSynchronizer
     	at org.kantega.invokerdefender.DefenderClassFileTransformer.preventDeserialization(DefenderClassFileTransformer.java:119)
 
 ## Rejecting deserialization entirely
