@@ -41,7 +41,7 @@ You can add your own classes to this list by passing a comma-separated list of c
 
 ## Whitelisting mode
 
-As always, it would be better if we could accept only classes excplicity allowed for deserialization. Rejecting based on a whitelist is better security than rejecting based on a blacklist.
+As always, it would be better if we could accept only classes we explicitly want to allow for deserialization. Rejecting based on a whitelist is better security than rejecting based on a blacklist.
 
 To help build a whitelist file with legitimately serializable classes, a 'dryrun' option has been added. Together with an empty white list, this will create a list of classes which your application actually deserializes.
 
