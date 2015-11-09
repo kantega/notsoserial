@@ -61,3 +61,7 @@ An Exception will be thrown, looking something like this:
 
     java.lang.IllegalStateException: Deserialization not allowed for class java.util.concurrent.locks.AbstractOwnableSynchronizer
     	at org.kantega.invokerdefender.DefenderClassFileTransformer.preventDeserialization(DefenderClassFileTransformer.java:119)
+
+## Rejecting deserialization entirely
+
+Just use an empty whitelist. Preliminary testing with a non-trivial Java application (which does not intentionally use RMI or other serialization) seems to indicate that this might work just fine. Looks like the JDK might not need serialization for any of its internal operations.
