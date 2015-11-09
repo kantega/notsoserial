@@ -5,7 +5,7 @@ invoker-defender is a Java Agent designed as a mitigation effort against deseria
 
 See http://foxglovesecurity.com/2015/11/06/what-do-weblogic-websphere-jboss-jenkins-opennms-and-your-application-have-in-common-this-vulnerability/ for details on this attack.
 
-> PLEASE NOTE: invoker-defender only does what it does. It does not fix the problem with deserialization attacks. It only knowns about and some well known classes which it makes unserializable. It cannot protect you from deserializing other vulnerable classes.
+> PLEASE NOTE: invoker-defender only does what it does. It does not fix the problem with deserialization attacks. It only knowns about some well known classes which it makes unserializable. It cannot protect you from deserializing other vulnerable classes.
 
 ## How?
  
@@ -38,3 +38,17 @@ You can add your own classes to this list by passing a comma-separated list of c
 
     -javaagent:invoker-defender.jar -Dinvoker.defender.custom.classes=com.example.Car,com.example.Wheel,com.example.Door
 
+
+## Future work
+
+An interesting idea would be white list packages / classes allowed for serialization instead of blacklisting. This would possibly some JDK-internal uses of serialization.
+
+Work on a white listing option is on progress on the 'whitelist' branch. 
+
+To help build a white list file with legitimately serializable classes, a 'dryrun' option has been added. Together with an empty white list, this will create a list of classes which your application actually deserializes.
+
+This can be produced by configuring the agent as follows:
+
+    -javaagent:invoker-defender.jar -Dinvoker.defender.whitelist=empty.txt -Dinvoker.defender.dryrun=is-deserialized.txt
+
+Where 'empty.txt' is an empty file and 'is-deserialized.txt' is a file where the names of your actually deserialized classes will be written to. 
