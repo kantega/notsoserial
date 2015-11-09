@@ -42,3 +42,13 @@ You can add your own classes to this list by passing a comma-separated list of c
 ## Future work
 
 An interesting idea would be white list packages / classes allowed for serialization instead of blacklisting. This would possibly some JDK-internal uses of serialization.
+
+Work on a white listing option is on progress on the 'whitelist' branch. 
+
+To help build a white list file with legitimately serializable classes, a 'dryrun' option has been added. Together with an empty white list, this will create a list of classes which your application actually deserializes.
+
+This can be produced by configuring the agent as follows:
+
+    -javaagent:invoker-defender.jar -Dinvoker.defender.whitelist=empty.txt -Dinvoker.defender.dryrun=is-deserialized.txt
+
+Where 'empty.txt' is an empty file and 'is-deserialized.txt' is a file where the names of your actually deserialized classes will be written to. 
