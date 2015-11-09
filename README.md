@@ -64,3 +64,18 @@ An Exception will be thrown, looking something like this:
 ## Rejecting deserialization entirely
 
 Just use an empty whitelist. Preliminary testing with a non-trivial Java application (which does not intentionally use RMI or other serialization) seems to indicate that this might work just fine. Looks like the JDK might not need serialization for any of its internal operations.
+
+
+## Tracing deserialization
+
+You might be interested not just in which classes your application deserialize, but also where in your code deserialization happens.
+
+This can be enabled by using the 'trace' option, like the following:
+
+     -javaagent:invoker-defender.jar -Dinvoker.defender.whitelist=empty.txt -Dinvoker.defender.dryrun=is-deserialized.txt -Dinvoker.defender.trace=deserialize-trace.txt
+
+ This will produce a file deserialize-trace.txt looking something like this:
+
+    Deserialization of class java.util.PriorityQueue
+             at: org.kantega.invokerdefender.InvokerDefenderWithDryRunWhitelistAndTraceIT.deserialize
+             at: org.kantega.invokerdefender.InvokerDefenderWithDryRunWhitelistAndTraceIT.shouldRecordClassesAsDeserialized

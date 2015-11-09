@@ -23,6 +23,8 @@ public class DefenderClassFileTransformer implements ClassFileTransformer {
 
     private static PrintWriter dryRunWriter = null;
 
+    private static PrintWriter traceWriter = null;
+
     private static Set<String> deserializingClasses = new ConcurrentSkipListSet<String>();
 
     static {
@@ -54,6 +56,16 @@ public class DefenderClassFileTransformer implements ClassFileTransformer {
             File dryRunFile = new File(dryRunPath);
             try {
                 dryRunWriter = new PrintWriter(new FileWriter(dryRunFile));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        String tracePath = System.getProperty("invoker.defender.trace");
+        if(tracePath != null) {
+            File traceFile = new File(tracePath);
+            try {
+                traceWriter = new PrintWriter(new FileWriter(traceFile));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -110,8 +122,21 @@ public class DefenderClassFileTransformer implements ClassFileTransformer {
         Set<String> deserializingClasses = DefenderClassFileTransformer.deserializingClasses;
         if(!deserializingClasses.contains(className)) {
             deserializingClasses.add(className);
-            dryRunWriter.println(className.replace('/', '.'));
+            String prettyName = className.replace('/', '.');
+            dryRunWriter.println(prettyName);
             dryRunWriter.flush();
+            if(traceWriter != null) {
+                traceWriter.println("Deserialization of class " + prettyName);
+                boolean foundReadObject = false;
+                for (StackTraceElement element : Thread.currentThread().getStackTrace()) {
+                    if(foundReadObject) {
+                        traceWriter.println("\t at: " + element.getClassName() +"." + element.getMethodName());
+                    } else if (element.getClassName().equals(ObjectInputStream.class.getName())
+                            && element.getMethodName().equals("readObject")) {
+                        foundReadObject = true;
+                    }
+                }
+            }
         }
     }
 
