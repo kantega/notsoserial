@@ -11,6 +11,12 @@ See http://foxglovesecurity.com/2015/11/06/what-do-weblogic-websphere-jboss-jenk
  
 invoker-defender makes some well known vulnerable classes non-serializable by rewriting their byte code when the class loads.
 
+## Usage
+
+Add the following parameter to your Java startup script:
+
+-javaagent:invoker-defender.jar
+
 ## Which classes are unserialized?
 
 By default, invoker-defender unserializes the following classes:
@@ -23,5 +29,5 @@ By default, invoker-defender unserializes the following classes:
 
 You can add your own classes to this list by passing a comma-separated list of classes as a system property:
 
--Dinvoker.defender.custom.classes=com.example.Car,com.example.Wheel,com.example.Door
+-javaagent:invoker-defender.jar -Dinvoker.defender.custom.classes=com.example.Car,com.example.Wheel,com.example.Door
 
