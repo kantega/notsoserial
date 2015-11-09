@@ -15,7 +15,13 @@ Trying to deserialize to a non-serializable class will result in an InvalidClass
 
 ## Usage
 
-Add the following parameter to your Java startup script:
+Build invoker-defender:
+
+    mvn clean install
+
+This builds an invoker-defender jar file in target/invoker-defender-1.0-SNAPSHOT.jar
+
+Copy this as invoker-defender.jar to your application, and add the following parameters to your Java startup script:
 
     -javaagent:invoker-defender.jar
 
@@ -23,11 +29,11 @@ Add the following parameter to your Java startup script:
 
 By default, invoker-defender unserializes the following classes:
 
-* org.​apache.​commons.​collections.​functors.​InvokerTransformer
-* org.​apache.​commons.​collections4.​functors.​InvokerTransformer
-* org.​codehaus.​groovy.​runtime.​ConvertedClosure
-* com.​sun.​org.​apache.​xalan.​internal.​xsltc.​trax.​TemplatesImpl
-* org.​apache.​commons.​collections.​Transformer
+* org.apache.commons.collections.functors.InvokerTransformer
+* org.apache.commons.collections4.functors.InvokerTransformer
+* org.codehaus.groovy.runtime.ConvertedClosure
+* com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl
+* org.apache.commons.collections.Transformer
 
 You can add your own classes to this list by passing a comma-separated list of classes as a system property:
 
