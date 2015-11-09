@@ -7,10 +7,7 @@ See http://foxglovesecurity.com/2015/11/06/what-do-weblogic-websphere-jboss-jenk
 
 ## How?
  
-invoker-defender makes some well known vulnerable classes non-serializable by rewriting their byte code when the class loads.
-
-Trying to deserialize to a non-serializable class will result in an InvalidClassException.
-
+invoker-defender makes some well known vulnerable classes effectively non-deserializable by rewriting their byte code when the class loads. It does so by adding a readObject (or modify an existing readObject) to throw an IllegalArgumentException when a deserialization attempt is made.
 
 ## Usage
 
@@ -29,7 +26,7 @@ Copy this as invoker-defender.jar to your application, and add the following par
 
 ## Which classes are rejected?
 
-By default, invoker-defender unserializes the following classes:
+By default, invoker-defender rejects deserialization of the following classes:
 
 * org.apache.commons.collections.functors.InvokerTransformer
 * org.apache.commons.collections4.functors.InvokerTransformer
