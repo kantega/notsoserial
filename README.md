@@ -38,3 +38,7 @@ You can add your own classes to this list by passing a comma-separated list of c
 
     -javaagent:invoker-defender.jar -Dinvoker.defender.custom.classes=com.example.Car,com.example.Wheel,com.example.Door
 
+
+## Future work
+
+An interesting idea would be white list packages / classes allowed for serialization instead of blacklisting. This would possibly some JDK-internal uses of serialization.
