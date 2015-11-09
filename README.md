@@ -76,6 +76,5 @@ This can be enabled by using the 'trace' option, like the following:
 
  This will produce a file deserialize-trace.txt looking something like this:
 
-    Deserialization of class java.util.PriorityQueue
-             at: org.kantega.invokerdefender.InvokerDefenderWithDryRunWhitelistAndTraceIT.deserialize
-             at: org.kantega.invokerdefender.InvokerDefenderWithDryRunWhitelistAndTraceIT.shouldRecordClassesAsDeserialized
+    Deserialization of class java.util.PriorityQueue (on Mon Nov 09 19:34:26 CET 2015)
+             at org.kantega.invokerdefender.InvokerDefenderWithDryRunWhitelistAndTraceIT.deserialize

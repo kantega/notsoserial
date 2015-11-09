@@ -8,6 +8,7 @@ import java.io.*;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.security.ProtectionDomain;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
@@ -126,11 +127,11 @@ public class DefenderClassFileTransformer implements ClassFileTransformer {
             dryRunWriter.println(prettyName);
             dryRunWriter.flush();
             if(traceWriter != null) {
-                traceWriter.println("Deserialization of class " + prettyName);
+                traceWriter.println("Deserialization of class " + prettyName +" (on " + new Date().toString() +")");
                 boolean foundReadObject = false;
                 for (StackTraceElement element : Thread.currentThread().getStackTrace()) {
                     if(foundReadObject) {
-                        traceWriter.println("\t at: " + element.getClassName() +"." + element.getMethodName());
+                        traceWriter.println("\t at " + element.getClassName() +"." + element.getMethodName());
                     } else if (element.getClassName().equals(ObjectInputStream.class.getName())
                             && element.getMethodName().equals("readObject")) {
                         foundReadObject = true;
