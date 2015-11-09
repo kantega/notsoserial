@@ -54,3 +54,10 @@ Where 'empty.txt' is an empty file and 'is-deserialized.txt' is a file where the
 After you are confident that all deserializable classes in your application have been recorded, you may restart your app, now reusing the recorded-as-serialized file as the whitelist:
 
     -javaagent:invoker-defender.jar -Dinvoker.defender.whitelist=is-deserialized.txt
+
+## What happens when invoker-defender rejects a deserialization attempt?
+
+An Exception will be thrown, looking something like this:
+
+    java.lang.IllegalStateException: Deserialization not allowed for class java.util.concurrent.locks.AbstractOwnableSynchronizer
+    	at org.kantega.invokerdefender.DefenderClassFileTransformer.preventDeserialization(DefenderClassFileTransformer.java:119)
