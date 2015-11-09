@@ -50,7 +50,6 @@ public class DryrunVisitor extends ClassVisitor{
     @Override
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         if(!isInterface() && isSerializable() && name.equals("readObject") && readObjectDescription.equals(desc)) {
-            System.out.println("ALTER DRYRUN: " + className);
             hasReadObject = true;
             return new MethodVisitor(Opcodes.ASM5, super.visitMethod(access, name, desc, signature, exceptions)) {
                 @Override
@@ -68,8 +67,6 @@ public class DryrunVisitor extends ClassVisitor{
     @Override
     public void visitEnd() {
         if(!isInterface() && isSerializable() && !hasReadObject) {
-
-            System.out.println("NEW DRYRUN: " + className);
 
             MethodVisitor mv = super.visitMethod(Opcodes.ACC_PRIVATE, "readObject", readObjectDescription, null, readObjectExceptions);
             mv.visitCode();
