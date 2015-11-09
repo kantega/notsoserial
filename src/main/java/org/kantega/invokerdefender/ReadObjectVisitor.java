@@ -11,7 +11,7 @@ import java.util.Set;
 /**
  *
  */
-public class DryrunVisitor extends ClassVisitor{
+public class ReadObjectVisitor extends ClassVisitor{
 
     private final String className;
     private String serializableName = Type.getInternalName(Serializable.class);
@@ -24,10 +24,12 @@ public class DryrunVisitor extends ClassVisitor{
     private int access;
 
     private static Set<String> serializableTypes = new HashSet<String>();
+    private final String onReadObjectCallbackMethod;
 
-    public DryrunVisitor(ClassVisitor classVisitor, String className) {
+    public ReadObjectVisitor(ClassVisitor classVisitor, String className, String onReadObjectCallbackMethod) {
         super(Opcodes.ASM5, classVisitor);
         this.className = className;
+        this.onReadObjectCallbackMethod = onReadObjectCallbackMethod;
     }
 
     @Override
@@ -56,7 +58,7 @@ public class DryrunVisitor extends ClassVisitor{
                 public void visitCode() {
                     super.visitCode();
                     mv.visitLdcInsn(className);
-                    mv.visitMethodInsn(Opcodes.INVOKESTATIC, Type.getType(DefenderClassFileTransformer.class).getInternalName(), "registerDeserialization", "(Ljava/lang/String;)V", false);
+                    mv.visitMethodInsn(Opcodes.INVOKESTATIC, Type.getType(DefenderClassFileTransformer.class).getInternalName(), onReadObjectCallbackMethod, "(Ljava/lang/String;)V", false);
                 }
             };
         } else {
@@ -73,7 +75,7 @@ public class DryrunVisitor extends ClassVisitor{
             Label l0 = new Label();
             mv.visitLabel(l0);
             mv.visitLdcInsn(className);
-            mv.visitMethodInsn(Opcodes.INVOKESTATIC, Type.getType(DefenderClassFileTransformer.class).getInternalName(), "registerDeserialization", "(Ljava/lang/String;)V", false);
+            mv.visitMethodInsn(Opcodes.INVOKESTATIC, Type.getType(DefenderClassFileTransformer.class).getInternalName(), onReadObjectCallbackMethod, "(Ljava/lang/String;)V", false);
             Label l1 = new Label();
             mv.visitLabel(l1);
             mv.visitVarInsn(Opcodes.ALOAD, 1);

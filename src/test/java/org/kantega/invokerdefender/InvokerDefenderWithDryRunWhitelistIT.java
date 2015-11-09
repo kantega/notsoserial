@@ -9,7 +9,6 @@ import org.junit.Test;
 import javax.xml.transform.TransformerConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
 import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
@@ -46,8 +45,6 @@ public class InvokerDefenderWithDryRunWhitelistIT {
         } catch (ClassCastException e) {
             // Ignore, happens after exploit effect
 
-        } catch (InvalidClassException e) {
-            // The object should not be deserializable
         }
         assertThat(System.getProperty("pwned"), is("true"));
 

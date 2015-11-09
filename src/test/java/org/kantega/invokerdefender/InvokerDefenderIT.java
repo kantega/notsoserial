@@ -21,7 +21,7 @@ import static org.junit.Assert.assertThat;
 public class InvokerDefenderIT {
 
     @Test
-    public void shouldWorkWithoutAgent() throws TransformerConfigurationException, IOException, ClassNotFoundException, AttachNotSupportedException, AgentLoadException, AgentInitializationException {
+    public void attachShouldWorkWithNoAgent() throws TransformerConfigurationException, IOException, ClassNotFoundException, AttachNotSupportedException, AgentLoadException, AgentInitializationException {
 
 
 

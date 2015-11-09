@@ -97,7 +97,8 @@ public class DefenderClassFileTransformer implements ClassFileTransformer {
         if(shouldUnserialize(className, loader, classfileBuffer)) {
             ClassReader reader = new ClassReader(classfileBuffer);
             ClassWriter writer = new ClassWriter(0);
-            ClassVisitor classVisitor = dryRunWriter != null ? new DryrunVisitor(writer, className) : new UnserializeVisitor(writer);
+            String onReadObjectCallbackMethod = dryRunWriter != null ? "registerDeserialization" : "preventDeserialization";
+            ClassVisitor classVisitor = new ReadObjectVisitor(writer, className, onReadObjectCallbackMethod);
             reader.accept(classVisitor, 0);
             return writer.toByteArray();
         }
@@ -112,6 +113,12 @@ public class DefenderClassFileTransformer implements ClassFileTransformer {
             dryRunWriter.flush();
         }
     }
+
+
+    public static void preventDeserialization(String className) {
+        throw new IllegalStateException("Deserialization not allowed for class " +className.replace('/','.'));
+    }
+
     private boolean shouldUnserialize(String className, ClassLoader loader, byte[] classfileBuffer) {
         if(className == null || classfileBuffer == null) {
             return false;

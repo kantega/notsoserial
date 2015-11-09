@@ -9,7 +9,6 @@ import org.junit.Test;
 import javax.xml.transform.TransformerConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
 import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
@@ -27,7 +26,7 @@ public class InvokerDefenderWithAgentIT {
 
 
     @Test
-    public void shouldNotWorkWith() throws TransformerConfigurationException, IOException, ClassNotFoundException, AttachNotSupportedException, AgentLoadException, AgentInitializationException {
+    public void attackShouldBePreventedWithAgent() throws TransformerConfigurationException, IOException, ClassNotFoundException, AttachNotSupportedException, AgentLoadException, AgentInitializationException {
 
         attachAgent();
 
@@ -40,8 +39,9 @@ public class InvokerDefenderWithAgentIT {
         } catch (ClassCastException e) {
             // Ignore, happens after exploit effect
 
-        } catch (InvalidClassException e) {
+        } catch (IllegalStateException e) {
             // The object should not be deserializable
+            System.out.println();
         }
 
         assertThat(System.getProperty("pwned"), is("false"));

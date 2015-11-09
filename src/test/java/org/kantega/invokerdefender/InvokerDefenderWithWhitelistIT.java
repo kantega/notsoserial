@@ -9,7 +9,6 @@ import org.junit.Test;
 import javax.xml.transform.TransformerConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
 import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
@@ -27,7 +26,7 @@ public class InvokerDefenderWithWhitelistIT {
 
 
     @Test
-    public void shouldRecordClassesAsDeserialized() throws TransformerConfigurationException, IOException, ClassNotFoundException, AttachNotSupportedException, AgentLoadException, AgentInitializationException {
+    public void emptyWhitelistShouldPreventAttack() throws TransformerConfigurationException, IOException, ClassNotFoundException, AttachNotSupportedException, AgentLoadException, AgentInitializationException {
 
         System.setProperty("invoker.defender.whitelist", "src/test/resources/whitelist.txt");
 
@@ -42,7 +41,7 @@ public class InvokerDefenderWithWhitelistIT {
         } catch (ClassCastException e) {
             // Ignore, happens after exploit effect
 
-        } catch (InvalidClassException e) {
+        } catch (IllegalStateException e) {
             // The object should not be deserializable
         }
         assertThat(System.getProperty("pwned"), is("false"));
