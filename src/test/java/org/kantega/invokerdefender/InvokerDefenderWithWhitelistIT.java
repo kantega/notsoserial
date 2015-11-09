@@ -14,10 +14,7 @@ import java.io.ObjectInputStream;
 import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Set;
-import java.util.TreeSet;
 
-import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -32,7 +29,7 @@ public class InvokerDefenderWithWhitelistIT {
     @Test
     public void shouldRecordClassesAsDeserialized() throws TransformerConfigurationException, IOException, ClassNotFoundException, AttachNotSupportedException, AgentLoadException, AgentInitializationException {
 
-        System.setProperty("invoker.defender.whitelist", "whitelist.txt");
+        System.setProperty("invoker.defender.whitelist", "src/test/resources/whitelist.txt");
 
         attachAgent();
 

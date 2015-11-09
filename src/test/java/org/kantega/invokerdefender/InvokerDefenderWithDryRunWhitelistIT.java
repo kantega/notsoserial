@@ -14,7 +14,6 @@ import java.io.ObjectInputStream;
 import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -33,7 +32,7 @@ public class InvokerDefenderWithDryRunWhitelistIT {
     @Test
     public void shouldRecordClassesAsDeserialized() throws TransformerConfigurationException, IOException, ClassNotFoundException, AttachNotSupportedException, AgentLoadException, AgentInitializationException {
 
-        System.setProperty("invoker.defender.whitelist", "whitelist.txt");
+        System.setProperty("invoker.defender.whitelist", "src/test/resources/whitelist.txt");
         System.setProperty("invoker.defender.dryrun", "target/is-deserialized.txt");
 
         attachAgent();
