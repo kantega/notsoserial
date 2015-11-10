@@ -3,6 +3,8 @@ NotSoSerial
 
 NotSoSerial is a Java Agent designed as a mitigation effort against deserialization attacks.
 
+Think of it as a "deserialization firewall". It gives you complete control over which classes your application should be allowed to deserialize.
+
 See http://foxglovesecurity.com/2015/11/06/what-do-weblogic-websphere-jboss-jenkins-opennms-and-your-application-have-in-common-this-vulnerability/ for details on this attack.
 
 ## How does it work?
