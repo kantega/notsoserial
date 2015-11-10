@@ -22,7 +22,7 @@ Copy this as invoker-defender.jar to your application, and add the following par
 
     -javaagent:invoker-defender.jar
 
-> PLEASE NOTE: In this case, invoker-defender only does blocks a few known vulnerabilities. It does not fix the problem with deserialization attacks. It only knowns about some well known classes for which it rejects deserialization. See below how you can whitelist or completely reject any objects to be deserialized.
+> PLEASE NOTE: In this mode, invoker-defender only does blocks a few known vulnerabilities. It does not fix the problem with deserialization attacks. It only knowns about some well known classes for which it rejects deserialization. See below how you can whitelist or completely reject any objects to be deserialized.
 
 
 ## Which classes are rejected?
