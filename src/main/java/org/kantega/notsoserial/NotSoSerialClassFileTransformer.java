@@ -1,4 +1,4 @@
-package org.kantega.invokerdefender;
+package org.kantega.notsoserial;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 /**
  *
  */
-public class DefenderClassFileTransformer implements ClassFileTransformer {
+public class NotSoSerialClassFileTransformer implements ClassFileTransformer {
 
     public static final Set<String> blacklist = new HashSet<String>();
 
@@ -33,7 +33,7 @@ public class DefenderClassFileTransformer implements ClassFileTransformer {
         blacklist.add(internalName("org.apache.commons.collections4.functors.InvokerTransformer"));
         blacklist.add(internalName("org.codehaus.groovy.​runtime.​ConvertedClosure"));
         blacklist.add(internalName("com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl"));
-        String classes = System.getProperty("invoker.defender.custom.classes");
+        String classes = System.getProperty("notsoserial.custom.classes");
         if(classes != null) {
             for (String className : classes.split(",")) {
                 className = className.trim();
@@ -41,18 +41,18 @@ public class DefenderClassFileTransformer implements ClassFileTransformer {
             }
         }
 
-        String whiteListProperty = System.getProperty("invoker.defender.whitelist");
+        String whiteListProperty = System.getProperty("notsoserial.whitelist");
         if(whiteListProperty != null) {
             File whiteListFile = new File(whiteListProperty);
             if(!whiteListFile.exists()) {
-                throw new IllegalArgumentException("Whitelist file specified by 'invoker.defender.whitelist' does not exist: " + whiteListFile);
+                throw new IllegalArgumentException("Whitelist file specified by 'notsoserial.whitelist' does not exist: " + whiteListFile);
 
             }
 
-            DefenderClassFileTransformer.whiteList = readWhiteList(whiteListFile);
+            NotSoSerialClassFileTransformer.whiteList = readWhiteList(whiteListFile);
         }
 
-        String dryRunPath = System.getProperty("invoker.defender.dryrun");
+        String dryRunPath = System.getProperty("notsoserial.dryrun");
         if(dryRunPath != null) {
             File dryRunFile = new File(dryRunPath);
             try {
@@ -62,7 +62,7 @@ public class DefenderClassFileTransformer implements ClassFileTransformer {
             }
         }
 
-        String tracePath = System.getProperty("invoker.defender.trace");
+        String tracePath = System.getProperty("notsoserial.trace");
         if(tracePath != null) {
             File traceFile = new File(tracePath);
             try {
@@ -81,7 +81,7 @@ public class DefenderClassFileTransformer implements ClassFileTransformer {
             br = new BufferedReader(new FileReader(whiteListFile));
             String line;
 
-            DefenderClassFileTransformer.whiteList = new HashSet<String>();
+            NotSoSerialClassFileTransformer.whiteList = new HashSet<String>();
             while((line = br.readLine()) != null) {
                 line = line.trim();
                 if(!line.isEmpty()) {
@@ -112,7 +112,7 @@ public class DefenderClassFileTransformer implements ClassFileTransformer {
             ClassReader reader = new ClassReader(classfileBuffer);
             ClassWriter writer = new ClassWriter(0);
             String onReadObjectCallbackMethod = dryRunWriter != null ? "registerDeserialization" : "preventDeserialization";
-            ClassVisitor classVisitor = new ReadObjectVisitor(writer, className, onReadObjectCallbackMethod);
+            ClassVisitor classVisitor = new ReadObjectClassVisitor(writer, className, onReadObjectCallbackMethod);
             reader.accept(classVisitor, 0);
             return writer.toByteArray();
         }
@@ -120,7 +120,7 @@ public class DefenderClassFileTransformer implements ClassFileTransformer {
     }
 
     public static void registerDeserialization(String className) {
-        Set<String> deserializingClasses = DefenderClassFileTransformer.deserializingClasses;
+        Set<String> deserializingClasses = NotSoSerialClassFileTransformer.deserializingClasses;
         if(!deserializingClasses.contains(className)) {
             deserializingClasses.add(className);
             String prettyName = className.replace('/', '.');
@@ -150,7 +150,7 @@ public class DefenderClassFileTransformer implements ClassFileTransformer {
         if(className == null || classfileBuffer == null) {
             return false;
         }
-        Set<String> whiteList = DefenderClassFileTransformer.whiteList;
+        Set<String> whiteList = NotSoSerialClassFileTransformer.whiteList;
         if(whiteList != null) {
             for (String prefix : whiteList) {
                 if(className.startsWith(prefix)) {

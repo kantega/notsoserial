@@ -1,33 +1,33 @@
-Invoker defender
+NotSoSerial
 ================
 
-invoker-defender is a Java Agent designed as a mitigation effort against deserialization attacks.
+NotSoSerial is a Java Agent designed as a mitigation effort against deserialization attacks.
 
 See http://foxglovesecurity.com/2015/11/06/what-do-weblogic-websphere-jboss-jenkins-opennms-and-your-application-have-in-common-this-vulnerability/ for details on this attack.
 
 ## How does it work?
  
-invoker-defender makes some well known vulnerable classes effectively non-deserializable by rewriting their byte code when the class loads.
+NotSoSerial makes some well known vulnerable classes effectively non-deserializable by rewriting their byte code when the class loads.
 It does so by adding a readObject method (or modifying an existing readObject method) to throw an UnsupportedOperationException when a deserialization attempt is made.
 
 ## Usage
 
-Build invoker-defender:
+Build NotSoSerial:
 
     mvn clean install
 
-This builds an invoker-defender jar file in target/invoker-defender-1.0-SNAPSHOT.jar
+This builds an NotSoSerial jar file in target/notsoserial-1.0-SNAPSHOT.jar
 
-Copy this as invoker-defender.jar to your application, and add the following parameters to your Java startup script:
+Copy this as notsoserial.jar to your application, and add the following parameters to your Java startup script:
 
-    -javaagent:invoker-defender.jar
+    -javaagent:notsoserial.jar
 
-> PLEASE NOTE: In this mode, invoker-defender only does blocks a few known vulnerabilities. It does not fix the problem with deserialization attacks. It only knowns about some well known classes for which it rejects deserialization. See below how you can whitelist or completely reject any objects to be deserialized.
+> PLEASE NOTE: In this mode, NotSoSerial only does blocks a few known vulnerabilities. It does not fix the problem with deserialization attacks. It only knowns about some well known classes for which it rejects deserialization. See below how you can whitelist or completely reject any objects to be deserialized.
 
 
 ## Which classes are rejected?
 
-By default, invoker-defender rejects deserialization of the following classes:
+By default, NotSoSerial rejects deserialization of the following classes:
 
 * org.apache.commons.collections.functors.InvokerTransformer
 * org.apache.commons.collections4.functors.InvokerTransformer
@@ -36,7 +36,7 @@ By default, invoker-defender rejects deserialization of the following classes:
 
 You can add your own classes to this list by passing a comma-separated list of classes as a system property:
 
-    -javaagent:invoker-defender.jar -Dinvoker.defender.custom.classes=com.example.Car,com.example.Wheel,com.example.Door
+    -javaagent:notsoserial.jar -Dnotsoserial.custom.classes=com.example.Car,com.example.Wheel,com.example.Door
 
 
 ## Whitelisting mode
@@ -47,20 +47,20 @@ To help build a whitelist file with legitimately serializable classes, a 'dryrun
 
 This can be produced by configuring the agent as follows:
 
-    -javaagent:invoker-defender.jar -Dinvoker.defender.whitelist=empty.txt -Dinvoker.defender.dryrun=is-deserialized.txt
+    -javaagent:notsoserial.jar -Dnotsoserial.whitelist=empty.txt -Dnotsoserial.dryrun=is-deserialized.txt
 
 Where 'empty.txt' is an empty file and 'is-deserialized.txt' is a file where the names of your actually deserialized classes will be written to. 
 
 After you are confident that all deserializable classes in your application have been recorded, you may restart your app, now reusing the recorded-as-serialized file as the whitelist:
 
-    -javaagent:invoker-defender.jar -Dinvoker.defender.whitelist=is-deserialized.txt
+    -javaagent:notsoserial.jar -Dnotsoserial.whitelist=is-deserialized.txt
 
-## What happens when invoker-defender rejects a deserialization attempt?
+## What happens when NotSoSerial rejects a deserialization attempt?
 
 An Exception will be thrown, looking something like this:
 
     java.lang.UnsupportedOperationException: Deserialization not allowed for class java.util.concurrent.locks.AbstractOwnableSynchronizer
-    	at org.kantega.invokerdefender.DefenderClassFileTransformer.preventDeserialization(DefenderClassFileTransformer.java:119)
+    	at org.kantega.notsoserial.NotSoSerialClassFileTransformer.preventDeserialization(NotSoSerialClassFileTransformer.java:119)
 
 ## Rejecting deserialization entirely
 
@@ -73,9 +73,9 @@ You might be interested not just in which classes your application deserialize, 
 
 This can be enabled by using the 'trace' option, like the following:
 
-     -javaagent:invoker-defender.jar -Dinvoker.defender.whitelist=empty.txt -Dinvoker.defender.dryrun=is-deserialized.txt -Dinvoker.defender.trace=deserialize-trace.txt
+     -javaagent:notsoserial.jar -Dnotsoserial.whitelist=empty.txt -Dnotsoserial.dryrun=is-deserialized.txt -Dnotsoserial.trace=deserialize-trace.txt
 
  This will produce a file deserialize-trace.txt looking something like this:
 
     Deserialization of class java.util.PriorityQueue (on Mon Nov 09 19:34:26 CET 2015)
-             at org.kantega.invokerdefender.InvokerDefenderWithDryRunWhitelistAndTraceIT.deserialize
+             at org.kantega.notsoserial.WithDryRunWhitelistAndTraceIT.deserialize

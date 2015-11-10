@@ -1,4 +1,4 @@
-package org.kantega.invokerdefender;
+package org.kantega.notsoserial;
 
 import com.sun.tools.attach.AgentInitializationException;
 import com.sun.tools.attach.AgentLoadException;
@@ -18,7 +18,7 @@ import static org.junit.Assert.assertThat;
 /**
  *
  */
-public class InvokerDefenderIT {
+public class WithoutAgentIT {
 
     @Test
     public void attachShouldWorkWithNoAgent() throws TransformerConfigurationException, IOException, ClassNotFoundException, AttachNotSupportedException, AgentLoadException, AgentInitializationException {

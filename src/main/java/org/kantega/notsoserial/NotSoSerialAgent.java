@@ -1,4 +1,4 @@
-package org.kantega.invokerdefender;
+package org.kantega.notsoserial;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,7 +10,7 @@ import java.util.jar.JarFile;
 /**
  *
  */
-public class DefenderAgent {
+public class NotSoSerialAgent {
 
     public static void premain(String options, Instrumentation instrumentation) throws Exception {
         addTransformer(instrumentation);
@@ -22,13 +22,13 @@ public class DefenderAgent {
 
     private static void addTransformer(Instrumentation instrumentation) {
         injectBootstrapClasspath(instrumentation);
-        instrumentation.addTransformer(new DefenderClassFileTransformer());
+        instrumentation.addTransformer(new NotSoSerialClassFileTransformer());
     }
 
     private static void injectBootstrapClasspath(Instrumentation instrumentation) {
 
         try {
-            URL resource = DefenderAgent.class.getResource("/org/kantega/defender/shaded/");
+            URL resource = NotSoSerialAgent.class.getResource("/org/kantega/notsoserial/shaded/");
 
             String path = resource.toURI().getSchemeSpecificPart();
             path = path.substring("file:".length(), path.indexOf("!"));

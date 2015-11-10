@@ -1,4 +1,4 @@
-package org.kantega.invokerdefender;
+package org.kantega.notsoserial;
 
 import com.sun.tools.attach.AgentInitializationException;
 import com.sun.tools.attach.AgentLoadException;
@@ -13,20 +13,27 @@ import java.io.ObjectInputStream;
 import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Set;
+import java.util.TreeSet;
 
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 /**
  *
  */
-public class InvokerDefenderWithAgentIT {
+public class WithDryRunWhitelistAndTraceIT {
 
 
 
 
     @Test
-    public void attackShouldBePreventedWithAgent() throws TransformerConfigurationException, IOException, ClassNotFoundException, AttachNotSupportedException, AgentLoadException, AgentInitializationException {
+    public void shouldRecordClassesAsDeserialized() throws TransformerConfigurationException, IOException, ClassNotFoundException, AttachNotSupportedException, AgentLoadException, AgentInitializationException {
+
+        System.setProperty("notsoserial.whitelist", "src/test/resources/whitelist.txt");
+        System.setProperty("notsoserial.dryrun", "target/is-deserialized.txt");
+        System.setProperty("notsoserial.trace", "target/deserialized-trace.txt");
 
         attachAgent();
 
@@ -39,12 +46,12 @@ public class InvokerDefenderWithAgentIT {
         } catch (ClassCastException e) {
             // Ignore, happens after exploit effect
 
-        } catch (UnsupportedOperationException e) {
-            // The object should not be deserializable
-            System.out.println();
         }
+        assertThat(System.getProperty("pwned"), is("true"));
 
-        assertThat(System.getProperty("pwned"), is("false"));
+        Set<String> deserialized = new TreeSet<String>(Files.readAllLines(Paths.get("target/is-deserialized.txt")));
+        assertThat(deserialized, hasItem("org.apache.commons.collections4.functors.InvokerTransformer"));
+        assertThat(deserialized, hasItem("java.util.PriorityQueue"));
     }
 
 
@@ -59,7 +66,7 @@ public class InvokerDefenderWithAgentIT {
 
         final VirtualMachine m = VirtualMachine.attach(pid);
 
-        m.loadAgent("target/invoker-defender-1.0-SNAPSHOT.jar");
+        m.loadAgent("target/notsoserial-1.0-SNAPSHOT.jar");
     }
 
 

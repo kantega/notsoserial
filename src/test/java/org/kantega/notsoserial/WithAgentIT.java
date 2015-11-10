@@ -1,4 +1,4 @@
-package org.kantega.invokerdefender;
+package org.kantega.notsoserial;
 
 import com.sun.tools.attach.AgentInitializationException;
 import com.sun.tools.attach.AgentLoadException;
@@ -20,15 +20,13 @@ import static org.junit.Assert.assertThat;
 /**
  *
  */
-public class InvokerDefenderWithWhitelistIT {
+public class WithAgentIT {
 
 
 
 
     @Test
-    public void emptyWhitelistShouldPreventAttack() throws TransformerConfigurationException, IOException, ClassNotFoundException, AttachNotSupportedException, AgentLoadException, AgentInitializationException {
-
-        System.setProperty("invoker.defender.whitelist", "src/test/resources/whitelist.txt");
+    public void attackShouldBePreventedWithAgent() throws TransformerConfigurationException, IOException, ClassNotFoundException, AttachNotSupportedException, AgentLoadException, AgentInitializationException {
 
         attachAgent();
 
@@ -43,7 +41,9 @@ public class InvokerDefenderWithWhitelistIT {
 
         } catch (UnsupportedOperationException e) {
             // The object should not be deserializable
+            System.out.println();
         }
+
         assertThat(System.getProperty("pwned"), is("false"));
     }
 
@@ -59,7 +59,7 @@ public class InvokerDefenderWithWhitelistIT {
 
         final VirtualMachine m = VirtualMachine.attach(pid);
 
-        m.loadAgent("target/invoker-defender-1.0-SNAPSHOT.jar");
+        m.loadAgent("target/notsoserial-1.0-SNAPSHOT.jar");
     }
 
 

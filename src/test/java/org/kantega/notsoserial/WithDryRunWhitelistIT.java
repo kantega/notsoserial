@@ -1,4 +1,4 @@
-package org.kantega.invokerdefender;
+package org.kantega.notsoserial;
 
 import com.sun.tools.attach.AgentInitializationException;
 import com.sun.tools.attach.AgentLoadException;
@@ -23,7 +23,7 @@ import static org.junit.Assert.assertThat;
 /**
  *
  */
-public class InvokerDefenderWithDryRunWhitelistIT {
+public class WithDryRunWhitelistIT {
 
 
 
@@ -31,8 +31,8 @@ public class InvokerDefenderWithDryRunWhitelistIT {
     @Test
     public void shouldRecordClassesAsDeserialized() throws TransformerConfigurationException, IOException, ClassNotFoundException, AttachNotSupportedException, AgentLoadException, AgentInitializationException {
 
-        System.setProperty("invoker.defender.whitelist", "src/test/resources/whitelist.txt");
-        System.setProperty("invoker.defender.dryrun", "target/is-deserialized.txt");
+        System.setProperty("notsoserial.whitelist", "src/test/resources/whitelist.txt");
+        System.setProperty("notsoserial.dryrun", "target/is-deserialized.txt");
 
         attachAgent();
 
@@ -65,7 +65,7 @@ public class InvokerDefenderWithDryRunWhitelistIT {
 
         final VirtualMachine m = VirtualMachine.attach(pid);
 
-        m.loadAgent("target/invoker-defender-1.0-SNAPSHOT.jar");
+        m.loadAgent("target/notsoserial-1.0-SNAPSHOT.jar");
     }
 
 

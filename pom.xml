@@ -3,12 +3,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.kantega</groupId>
-    <artifactId>invoker-defender</artifactId>
+    <artifactId>notsoserial</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-
-    <name>invoker-defender</name>
-    <url>http://maven.apache.org</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -80,8 +77,8 @@
                 <configuration>
                     <archive>
                         <manifestEntries>
-                            <Agent-Class>org.kantega.invokerdefender.DefenderAgent</Agent-Class>
-                            <Premain-Class>org.kantega.invokerdefender.DefenderAgent</Premain-Class>
+                            <Agent-Class>org.kantega.notsoserial.NotSoSerialAgent</Agent-Class>
+                            <Premain-Class>org.kantega.notsoserial.NotSoSerialAgent</Premain-Class>
                         </manifestEntries>
                     </archive>
                 </configuration>
@@ -101,7 +98,7 @@
                             <relocations>
                                 <relocation>
                                     <pattern>org.objectweb.asm</pattern>
-                                    <shadedPattern>org.kantega.defender.shaded.org.objectweb.asm</shadedPattern>
+                                    <shadedPattern>org.kantega.notsoserial.shaded.org.objectweb.asm</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>

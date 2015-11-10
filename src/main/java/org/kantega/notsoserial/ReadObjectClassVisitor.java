@@ -1,4 +1,4 @@
-package org.kantega.invokerdefender;
+package org.kantega.notsoserial;
 
 import org.objectweb.asm.*;
 
@@ -11,7 +11,7 @@ import java.util.Set;
 /**
  *
  */
-public class ReadObjectVisitor extends ClassVisitor{
+public class ReadObjectClassVisitor extends ClassVisitor{
 
     private final String className;
     private String serializableName = Type.getInternalName(Serializable.class);
@@ -26,7 +26,7 @@ public class ReadObjectVisitor extends ClassVisitor{
     private static Set<String> serializableTypes = new HashSet<String>();
     private final String onReadObjectCallbackMethod;
 
-    public ReadObjectVisitor(ClassVisitor classVisitor, String className, String onReadObjectCallbackMethod) {
+    public ReadObjectClassVisitor(ClassVisitor classVisitor, String className, String onReadObjectCallbackMethod) {
         super(Opcodes.ASM5, classVisitor);
         this.className = className;
         this.onReadObjectCallbackMethod = onReadObjectCallbackMethod;
@@ -58,7 +58,7 @@ public class ReadObjectVisitor extends ClassVisitor{
                 public void visitCode() {
                     super.visitCode();
                     mv.visitLdcInsn(className);
-                    mv.visitMethodInsn(Opcodes.INVOKESTATIC, Type.getType(DefenderClassFileTransformer.class).getInternalName(), onReadObjectCallbackMethod, "(Ljava/lang/String;)V", false);
+                    mv.visitMethodInsn(Opcodes.INVOKESTATIC, Type.getType(NotSoSerialClassFileTransformer.class).getInternalName(), onReadObjectCallbackMethod, "(Ljava/lang/String;)V", false);
                 }
             };
         } else {
@@ -75,7 +75,7 @@ public class ReadObjectVisitor extends ClassVisitor{
             Label l0 = new Label();
             mv.visitLabel(l0);
             mv.visitLdcInsn(className);
-            mv.visitMethodInsn(Opcodes.INVOKESTATIC, Type.getType(DefenderClassFileTransformer.class).getInternalName(), onReadObjectCallbackMethod, "(Ljava/lang/String;)V", false);
+            mv.visitMethodInsn(Opcodes.INVOKESTATIC, Type.getType(NotSoSerialClassFileTransformer.class).getInternalName(), onReadObjectCallbackMethod, "(Ljava/lang/String;)V", false);
             Label l1 = new Label();
             mv.visitLabel(l1);
             mv.visitVarInsn(Opcodes.ALOAD, 1);
