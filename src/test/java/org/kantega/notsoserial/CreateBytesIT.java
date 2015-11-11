@@ -30,7 +30,10 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -70,11 +73,6 @@ public class CreateBytesIT {
         queue[0] = templates;
         queue[1] = templates;
         return priorityQueue;
-    }
-
-    private Object deserialize(byte[] ser) throws IOException, ClassNotFoundException {
-        ObjectInputStream stream = new ObjectInputStream(new ByteArrayInputStream(ser));
-        return stream.readObject();
     }
 
     private byte[] serialize(Object object) throws IOException {

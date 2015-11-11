@@ -23,12 +23,13 @@ import com.sun.tools.attach.VirtualMachine;
 import org.junit.Test;
 
 import javax.xml.transform.TransformerConfigurationException;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -36,13 +37,15 @@ import static org.junit.Assert.assertThat;
 /**
  *
  */
-public class WithAgentIT {
+public class WithNonEmptyWhitelistIT {
 
 
 
 
     @Test
-    public void attackShouldBePreventedWithAgent() throws TransformerConfigurationException, IOException, ClassNotFoundException, AttachNotSupportedException, AgentLoadException, AgentInitializationException {
+    public void javaWhiteListShouldPreventAttachYetAllowArrayList() throws TransformerConfigurationException, IOException, ClassNotFoundException, AttachNotSupportedException, AgentLoadException, AgentInitializationException {
+
+        System.setProperty("notsoserial.whitelist", "src/test/resources/whitelist-java.txt");
 
         attachAgent();
 
@@ -57,16 +60,23 @@ public class WithAgentIT {
 
         } catch (UnsupportedOperationException e) {
             // The object should not be deserializable
-            System.out.println();
         }
-
         assertThat(System.getProperty("pwned"), is("false"));
+
+        Queue<String> strings = (Queue<String>) deserialize(serialize(new PriorityQueue<String>(Arrays.asList("one", "two", "three"))));
+    }
+
+    private byte[] serialize(Object object) throws IOException {
+        ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        ObjectOutputStream out = new ObjectOutputStream(bout);
+        out.writeObject(object);
+        return bout.toByteArray();
     }
 
 
 
 
-    public static void attachAgent() throws IOException, AttachNotSupportedException, AgentLoadException, AgentInitializationException {
+    private void attachAgent() throws IOException, AttachNotSupportedException, AgentLoadException, AgentInitializationException {
 
         String name = ManagementFactory.getRuntimeMXBean().getName();
         String pid = name.substring(0, name.indexOf("@"));
@@ -80,7 +90,7 @@ public class WithAgentIT {
 
 
 
-    public static Object deserialize(byte[] ser) throws IOException, ClassNotFoundException {
+    private Object deserialize(byte[] ser) throws IOException, ClassNotFoundException {
         ObjectInputStream stream = new ObjectInputStream(new ByteArrayInputStream(ser));
         return stream.readObject();
     }

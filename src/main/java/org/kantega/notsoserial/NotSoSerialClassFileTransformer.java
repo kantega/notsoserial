@@ -166,19 +166,28 @@ public class NotSoSerialClassFileTransformer implements ClassFileTransformer {
     }
 
     private boolean shouldInstrument(String className, byte[] classfileBuffer) {
-        if(className == null || classfileBuffer == null) {
+        if (className == null || classfileBuffer == null) {
             return false;
         }
-        Set<String> whiteList = NotSoSerialClassFileTransformer.whiteList;
-        if(whiteList != null) {
-            for (String prefix : whiteList) {
-                if(className.startsWith(prefix)) {
-                    return false;
-                }
-            }
+        if (isBlacklisted(className)) {
             return true;
-        } else {
-            return blacklist.contains(className);
         }
+        Set<String> whiteList = NotSoSerialClassFileTransformer.whiteList;
+
+        return whiteList != null && !isWhitelisted(className, whiteList);
+
+    }
+
+    private boolean isWhitelisted(String className, Set<String> whiteList) {
+        for (String prefix : whiteList) {
+            if(className.startsWith(prefix)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isBlacklisted(String className) {
+        return blacklist.contains(className);
     }
 }

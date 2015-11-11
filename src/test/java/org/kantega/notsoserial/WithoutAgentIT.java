@@ -22,14 +22,13 @@ import com.sun.tools.attach.AttachNotSupportedException;
 import org.junit.Test;
 
 import javax.xml.transform.TransformerConfigurationException;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.kantega.notsoserial.WithAgentIT.deserialize;
 
 /**
  *
@@ -54,13 +53,6 @@ public class WithoutAgentIT {
 
         assertThat(System.getProperty("pwned"), is("true"));
 
-    }
-
-
-
-    private Object deserialize(byte[] ser) throws IOException, ClassNotFoundException {
-        ObjectInputStream stream = new ObjectInputStream(new ByteArrayInputStream(ser));
-        return stream.readObject();
     }
 
 }
