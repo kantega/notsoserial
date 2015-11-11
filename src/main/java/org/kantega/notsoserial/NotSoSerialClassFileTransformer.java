@@ -127,7 +127,7 @@ public class NotSoSerialClassFileTransformer implements ClassFileTransformer {
     }
 
     public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
-        if(shouldUnserialize(className, classfileBuffer)) {
+        if(shouldInstrument(className, classfileBuffer)) {
             ClassReader reader = new ClassReader(classfileBuffer);
             ClassWriter writer = new ClassWriter(0);
             String onReadObjectCallbackMethod = dryRunWriter != null ? "registerDeserialization" : "preventDeserialization";
@@ -165,7 +165,7 @@ public class NotSoSerialClassFileTransformer implements ClassFileTransformer {
         throw new UnsupportedOperationException("Deserialization not allowed for class " +className.replace('/','.'));
     }
 
-    private boolean shouldUnserialize(String className, byte[] classfileBuffer) {
+    private boolean shouldInstrument(String className, byte[] classfileBuffer) {
         if(className == null || classfileBuffer == null) {
             return false;
         }
