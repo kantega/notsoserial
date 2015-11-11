@@ -11,6 +11,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.lang.management.ManagementFactory;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Set;
@@ -48,7 +49,7 @@ public class WithDryRunWhitelistIT {
         }
         assertThat(System.getProperty("pwned"), is("true"));
 
-        Set<String> deserialized = new TreeSet<String>(Files.readAllLines(Paths.get("target/is-deserialized.txt")));
+        Set<String> deserialized = new TreeSet<String>(Files.readAllLines(Paths.get("target/is-deserialized.txt"),StandardCharsets.UTF_8));
         assertThat(deserialized, hasItem("org.apache.commons.collections4.functors.InvokerTransformer"));
         assertThat(deserialized, hasItem("java.util.PriorityQueue"));
     }
