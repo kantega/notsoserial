@@ -33,7 +33,7 @@ public class NotSoSerialClassFileTransformer implements ClassFileTransformer {
         blacklist.add(internalName("org.apache.commons.collections4.functors.InvokerTransformer"));
         blacklist.add(internalName("org.apache.commons.collections.functors.InstantiateTransformer"));
         blacklist.add(internalName("org.apache.commons.collections4.functors.InstantiateTransformer"));
-        blacklist.add(internalName("org.codehaus.groovy.​runtime.​ConvertedClosure"));
+        blacklist.add(internalName("org.codehaus.groovy.runtime.ConvertedClosure"));
         blacklist.add(internalName("com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl"));
 
         String classes = System.getProperty("notsoserial.custom.classes");
