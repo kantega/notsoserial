@@ -126,19 +126,25 @@ public class NotSoSerialClassFileTransformer implements ClassFileTransformer {
     }
 
     public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
-        if(shouldInstrument(className, classfileBuffer)) {
+
+
+        if(isObjectInputStream(className))  {
             ClassReader reader = new ClassReader(classfileBuffer);
             ClassWriter writer = new ClassWriter(0);
-            String onReadObjectCallbackMethod = dryRunWriter != null ? "registerDeserialization" : "preventDeserialization";
-            ReadObjectClassVisitor classVisitor = new ReadObjectClassVisitor(writer, className, onReadObjectCallbackMethod);
+            String callbackMethod = dryRunWriter != null ? "registerDeserialization" : "preventDeserialization";
+            ObjectInputStreamClassVisitor classVisitor = new ObjectInputStreamClassVisitor(writer, callbackMethod);
             reader.accept(classVisitor, 0);
-            return classVisitor.isSerializable() ? writer.toByteArray() : null;
+            return writer.toByteArray();
         }
         return null;
     }
 
-    public static void registerDeserialization(String className) {
-        Set<String> deserializingClasses = NotSoSerialClassFileTransformer.deserializingClasses;
+    private boolean isObjectInputStream(String className) {
+        return "java/io/ObjectInputStream".equals(className);
+    }
+
+    public static ObjectStreamClass registerDeserialization(ObjectStreamClass desc) {
+        String className = desc.getName();
         if(!deserializingClasses.contains(className)) {
             deserializingClasses.add(className);
             String prettyName = className.replace('/', '.');
@@ -157,35 +163,36 @@ public class NotSoSerialClassFileTransformer implements ClassFileTransformer {
                 }
             }
         }
+        return desc;
     }
 
 
-    public static void preventDeserialization(String className) {
-        throw new UnsupportedOperationException("Deserialization not allowed for class " +className.replace('/','.'));
-    }
-
-    private boolean shouldInstrument(String className, byte[] classfileBuffer) {
-        if (className == null || classfileBuffer == null) {
-            return false;
+    public static ObjectStreamClass preventDeserialization(ObjectStreamClass desc) {
+        String className = desc.getName();
+        if(shouldReject(className.replace('.','/'))) {
+            throw new UnsupportedOperationException("Deserialization not allowed for class " + className.replace('/', '.'));
         }
+        return desc;
+    }
+
+    private static boolean shouldReject(String className) {
         if (isBlacklisted(className)) {
             return true;
         }
         Set<String> whiteList = NotSoSerialClassFileTransformer.whiteList;
 
         return whiteList != null && !isWhitelisted(className, whiteList);
-
     }
 
-    private boolean isWhitelisted(String className, Set<String> whiteList) {
+    private static boolean isWhitelisted(String className, Set<String> whiteList) {
         return isPrefixMatch(className, whiteList);
     }
 
-    private boolean isBlacklisted(String className) {
+    private static boolean isBlacklisted(String className) {
         return isPrefixMatch(className, blacklist);
     }
 
-    private boolean isPrefixMatch(String className, Set<String> whiteList) {
+    private static boolean isPrefixMatch(String className, Set<String> whiteList) {
         for (String prefix : whiteList) {
             if(className.startsWith(prefix)) {
                 return true;
