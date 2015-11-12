@@ -21,11 +21,17 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 
+import java.io.ObjectStreamClass;
+
 /**
  *
  */
 public class ObjectInputStreamClassVisitor extends ClassVisitor {
     private final String callbackMethod;
+
+    private final String resolveClassDesc = Type.getMethodDescriptor(Type.getType(Class.class), Type.getType(ObjectStreamClass.class));
+
+    private final String callBackDescriptor = Type.getMethodDescriptor(Type.getType(ObjectStreamClass.class), Type.getType(ObjectStreamClass.class));
 
     public ObjectInputStreamClassVisitor(ClassVisitor cv, String callbackMethod) {
         super(Opcodes.ASM5, cv);
@@ -36,24 +42,20 @@ public class ObjectInputStreamClassVisitor extends ClassVisitor {
     @Override
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
-        if("resolveClass".equals(name)) {
-            return new ResolveClassVisitor(mv);
-        } else {
-            return mv;
-        }
+        return new ResolveClassCallSiteVisitor(mv);
     }
 
-    private class ResolveClassVisitor extends MethodVisitor {
-        public ResolveClassVisitor(MethodVisitor mv) {
+    private class ResolveClassCallSiteVisitor extends MethodVisitor {
+        public ResolveClassCallSiteVisitor(MethodVisitor mv) {
             super(Opcodes.ASM5, mv);
         }
 
         @Override
-        public void visitCode() {
-            super.visitCode();
-            mv.visitVarInsn(Opcodes.ALOAD, 1);
-            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/ObjectStreamClass", "getName", "()Ljava/lang/String;", false);
-            mv.visitMethodInsn(Opcodes.INVOKESTATIC, Type.getType(NotSoSerialClassFileTransformer.class).getInternalName(), callbackMethod, "(Ljava/lang/String;)V", false);
+        public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
+            if (name.equals("resolveClass") && resolveClassDesc.equals(desc)) {
+                mv.visitMethodInsn(Opcodes.INVOKESTATIC, Type.getType(NotSoSerialClassFileTransformer.class).getInternalName(), callbackMethod, callBackDescriptor, false);
+            }
+            super.visitMethodInsn(opcode, owner, name, desc, itf);
         }
     }
 }

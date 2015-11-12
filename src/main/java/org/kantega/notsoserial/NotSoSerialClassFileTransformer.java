@@ -143,8 +143,8 @@ public class NotSoSerialClassFileTransformer implements ClassFileTransformer {
         return "java/io/ObjectInputStream".equals(className);
     }
 
-    public static void registerDeserialization(String className) {
-        Set<String> deserializingClasses = NotSoSerialClassFileTransformer.deserializingClasses;
+    public static ObjectStreamClass registerDeserialization(ObjectStreamClass desc) {
+        String className = desc.getName();
         if(!deserializingClasses.contains(className)) {
             deserializingClasses.add(className);
             String prettyName = className.replace('/', '.');
@@ -163,13 +163,16 @@ public class NotSoSerialClassFileTransformer implements ClassFileTransformer {
                 }
             }
         }
+        return desc;
     }
 
 
-    public static void preventDeserialization(String className) {
+    public static ObjectStreamClass preventDeserialization(ObjectStreamClass desc) {
+        String className = desc.getName();
         if(shouldReject(className.replace('.','/'))) {
             throw new UnsupportedOperationException("Deserialization not allowed for class " + className.replace('/', '.'));
         }
+        return desc;
     }
 
     private static boolean shouldReject(String className) {
