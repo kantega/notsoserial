@@ -19,6 +19,7 @@ package org.kantega.notsoserial;
 import java.io.File;
 import java.io.IOException;
 import java.lang.instrument.Instrumentation;
+import java.lang.instrument.UnmodifiableClassException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.jar.JarFile;
@@ -38,7 +39,17 @@ public class NotSoSerialAgent {
 
     private static void addTransformer(Instrumentation instrumentation) {
         injectBootstrapClasspath(instrumentation);
-        instrumentation.addTransformer(new NotSoSerialClassFileTransformer());
+        instrumentation.addTransformer(new NotSoSerialClassFileTransformer(), true);
+
+        for (Class clazz : instrumentation.getAllLoadedClasses()) {
+            if("java.io.ObjectInputStream".equals(clazz.getName())) {
+                try {
+                    instrumentation.retransformClasses(clazz);
+                } catch (UnmodifiableClassException e) {
+                    throw new RuntimeException("Could not retransform class " + clazz.getName(), e);
+                }
+            }
+        }
     }
 
     private static void injectBootstrapClasspath(Instrumentation instrumentation) {

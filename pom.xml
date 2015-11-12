@@ -93,6 +93,7 @@
                 <configuration>
                     <archive>
                         <manifestEntries>
+                            <Can-Retransform-Classes>true</Can-Retransform-Classes>
                             <Agent-Class>org.kantega.notsoserial.NotSoSerialAgent</Agent-Class>
                             <Premain-Class>org.kantega.notsoserial.NotSoSerialAgent</Premain-Class>
                         </manifestEntries>
