@@ -17,7 +17,6 @@
 package org.kantega.notsoserial;
 
 import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 
 import java.io.*;
@@ -131,11 +130,11 @@ public class NotSoSerialClassFileTransformer implements ClassFileTransformer {
             ClassReader reader = new ClassReader(classfileBuffer);
             ClassWriter writer = new ClassWriter(0);
             String onReadObjectCallbackMethod = dryRunWriter != null ? "registerDeserialization" : "preventDeserialization";
-            ClassVisitor classVisitor = new ReadObjectClassVisitor(writer, className, onReadObjectCallbackMethod);
+            ReadObjectClassVisitor classVisitor = new ReadObjectClassVisitor(writer, className, onReadObjectCallbackMethod);
             reader.accept(classVisitor, 0);
-            return writer.toByteArray();
+            return classVisitor.isSerializable() ? writer.toByteArray() : null;
         }
-        return classfileBuffer;
+        return null;
     }
 
     public static void registerDeserialization(String className) {
