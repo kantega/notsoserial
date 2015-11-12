@@ -9,9 +9,9 @@ See http://foxglovesecurity.com/2015/11/06/what-do-weblogic-websphere-jboss-jenk
 
 ## How does it work?
  
-NotSoSerial makes some well known vulnerable classes effectively non-deserializable by preventing to load.
+NotSoSerial makes some well known vulnerable classes effectively non-deserializable by preventing them to load.
 
-It does so by adding a check before ObjectInputStream.resolveClass is called. If the class is not allowd, an UnsupportedOperationException is called instead of calling resolveClass.
+It does so by adding a check just before the call to ObjectInputStream.resolveClass. If the class is not allowed, an UnsupportedOperationException is called instead of calling resolveClass.
 
 This means the class never even gets loaded.
 
