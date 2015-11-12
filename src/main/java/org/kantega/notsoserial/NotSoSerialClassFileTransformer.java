@@ -126,15 +126,27 @@ public class NotSoSerialClassFileTransformer implements ClassFileTransformer {
     }
 
     public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
+
+        String callbackMethod = dryRunWriter != null ? "registerDeserialization" : "preventDeserialization";
+
+        if(isObjectInputStream(className))  {
+            ClassReader reader = new ClassReader(classfileBuffer);
+            ClassWriter writer = new ClassWriter(0);
+            ObjectInputStreamClassVisitor classVisitor = new ObjectInputStreamClassVisitor(writer, callbackMethod);
+            reader.accept(classVisitor, 0);
+        }
         if(shouldInstrument(className, classfileBuffer)) {
             ClassReader reader = new ClassReader(classfileBuffer);
             ClassWriter writer = new ClassWriter(0);
-            String onReadObjectCallbackMethod = dryRunWriter != null ? "registerDeserialization" : "preventDeserialization";
-            ReadObjectClassVisitor classVisitor = new ReadObjectClassVisitor(writer, className, onReadObjectCallbackMethod);
+            ReadObjectClassVisitor classVisitor = new ReadObjectClassVisitor(writer, className, callbackMethod);
             reader.accept(classVisitor, 0);
             return classVisitor.isSerializable() ? writer.toByteArray() : null;
         }
         return null;
+    }
+
+    private boolean isObjectInputStream(String className) {
+        return "java/io/ObjectInputStream".equals(className);
     }
 
     public static void registerDeserialization(String className) {
