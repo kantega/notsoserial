@@ -29,13 +29,14 @@ import java.io.ObjectStreamClass;
 public class ObjectInputStreamClassVisitor extends ClassVisitor {
     private final String callbackMethod;
 
-    private final String resolveClassDesc = Type.getMethodDescriptor(Type.getType(Class.class), Type.getType(ObjectStreamClass.class));
+    private final String resolveClassDesc = "(Ljava/io/ObjectStreamClass;)Ljava/lang/Class;";
 
-    private final String callBackDescriptor = Type.getMethodDescriptor(Type.getType(ObjectStreamClass.class), Type.getType(ObjectStreamClass.class));
+    private final String callBackDescriptor = "(Ljava/io/ObjectStreamClass;)Ljava/io/ObjectStreamClass;";
 
-    public ObjectInputStreamClassVisitor(ClassVisitor cv, String callbackMethod) {
+    public ObjectInputStreamClassVisitor(ClassVisitor cv) {
         super(Opcodes.ASM5, cv);
-        this.callbackMethod = callbackMethod;
+        Options options = Options.getInstance();
+        this.callbackMethod = options.isDryRun() ? "registerDeserialization" : "preventDeserialization";
     }
 
 
@@ -43,6 +44,20 @@ public class ObjectInputStreamClassVisitor extends ClassVisitor {
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
         return new ResolveClassCallSiteVisitor(mv);
+    }
+
+    public static ObjectStreamClass registerDeserialization(ObjectStreamClass desc) {
+        String className = desc.getName();
+        Options.getInstance().registerDeserialization(className);
+        return desc;
+    }
+
+    public static ObjectStreamClass preventDeserialization(ObjectStreamClass desc) {
+        String className = desc.getName();
+        if(Options.getInstance().shouldReject(className.replace('.', '/'))) {
+            throw new UnsupportedOperationException("Deserialization not allowed for class " + className.replace('/', '.'));
+        }
+        return desc;
     }
 
     private class ResolveClassCallSiteVisitor extends MethodVisitor {
@@ -53,7 +68,7 @@ public class ObjectInputStreamClassVisitor extends ClassVisitor {
         @Override
         public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
             if (name.equals("resolveClass") && resolveClassDesc.equals(desc)) {
-                mv.visitMethodInsn(Opcodes.INVOKESTATIC, Type.getType(NotSoSerialClassFileTransformer.class).getInternalName(), callbackMethod, callBackDescriptor, false);
+                mv.visitMethodInsn(Opcodes.INVOKESTATIC, Type.getType(ObjectInputStreamClassVisitor.class).getInternalName(), callbackMethod, callBackDescriptor, false);
             }
             super.visitMethodInsn(opcode, owner, name, desc, itf);
         }

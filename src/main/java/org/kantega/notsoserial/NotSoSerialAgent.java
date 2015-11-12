@@ -38,7 +38,10 @@ public class NotSoSerialAgent {
     }
 
     private static void addTransformer(Instrumentation instrumentation) {
+
+
         injectBootstrapClasspath(instrumentation);
+
         instrumentation.addTransformer(new NotSoSerialClassFileTransformer(), true);
 
         for (Class clazz : instrumentation.getAllLoadedClasses()) {
