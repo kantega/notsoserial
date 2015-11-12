@@ -178,15 +178,19 @@ public class NotSoSerialClassFileTransformer implements ClassFileTransformer {
     }
 
     private boolean isWhitelisted(String className, Set<String> whiteList) {
+        return isPrefixMatch(className, whiteList);
+    }
+
+    private boolean isBlacklisted(String className) {
+        return isPrefixMatch(className, blacklist);
+    }
+
+    private boolean isPrefixMatch(String className, Set<String> whiteList) {
         for (String prefix : whiteList) {
             if(className.startsWith(prefix)) {
                 return true;
             }
         }
         return false;
-    }
-
-    private boolean isBlacklisted(String className) {
-        return blacklist.contains(className);
     }
 }
