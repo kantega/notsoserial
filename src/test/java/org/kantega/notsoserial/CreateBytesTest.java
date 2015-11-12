@@ -43,7 +43,7 @@ import java.util.Queue;
 /**
  *
  */
-public class CreateBytesIT {
+public class CreateBytesTest {
 
     @Test
     public void shouldCreateBytes() throws IOException, ClassNotFoundException {
