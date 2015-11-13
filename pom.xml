@@ -25,7 +25,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <asm.version>5.0.3</asm.version>
+        <asm.version>5.0.4</asm.version>
     </properties>
 
     <licenses>
@@ -52,7 +52,7 @@
 
         <dependency>
             <groupId>org.ow2.asm</groupId>
-            <artifactId>asm-debug-all</artifactId>
+            <artifactId>asm</artifactId>
             <version>${asm.version}</version>
         </dependency>
 
@@ -70,6 +70,22 @@
 
 
     <build>
+        <resources>
+            <resource>
+                <directory>${basedir}</directory>
+                <includes>
+                    <include>LICENSE</include>
+                </includes>
+                <targetPath>META-INF/</targetPath>
+            </resource>
+            <resource>
+                <directory>${basedir}</directory>
+                <includes>
+                    <include>LICENSE-ASM</include>
+                </includes>
+                <targetPath>META-INF/</targetPath>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -125,6 +141,14 @@
                                     <shadedPattern>org.kantega.notsoserial.shaded.org.objectweb.asm</shadedPattern>
                                 </relocation>
                             </relocations>
+                            <!--<filters>
+                                <filter>
+                                    <artifact>org.ow2.asm:asm-debug-all</artifact>
+                                    <includes>
+                                        <include>META-INF/resources/webjars/angularjs/${angularjs.version}/angular.*</include>
+                                    </includes>
+                                </filter>
+                            </filters>-->
                         </configuration>
                     </execution>
                 </executions>
