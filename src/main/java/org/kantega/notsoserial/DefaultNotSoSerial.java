@@ -27,7 +27,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
  */
 public class DefaultNotSoSerial implements NotSoSerial {
 
-    public  final Set<String> blacklist = new HashSet<String>();
+    private  final Set<String> blacklist = new HashSet<String>();
 
     private Set<String> whiteList = null;
 
@@ -121,7 +121,7 @@ public class DefaultNotSoSerial implements NotSoSerial {
     }
 
 
-    public boolean shouldReject(String className) {
+    private boolean shouldReject(String className) {
         if (isBlacklisted(className)) {
             return true;
         }
@@ -147,7 +147,7 @@ public class DefaultNotSoSerial implements NotSoSerial {
     }
 
 
-    public boolean isDryRun() {
+    private boolean isDryRun() {
         return dryRunWriter != null;
     }
 
@@ -155,7 +155,7 @@ public class DefaultNotSoSerial implements NotSoSerial {
 
 
 
-    public void registerDeserialization(String className) {
+    private void registerDeserialization(String className) {
         if(!deserializingClasses.contains(className)) {
             deserializingClasses.add(className);
             String prettyName = className.replace('/', '.');
