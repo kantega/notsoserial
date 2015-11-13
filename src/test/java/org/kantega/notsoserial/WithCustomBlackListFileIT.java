@@ -29,38 +29,24 @@ import java.util.Arrays;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 import static org.kantega.notsoserial.WithAgentIT.attachAgent;
 
 /**
  *
  */
-public class WithNonEmptyWhitelistIT {
+public class WithCustomBlackListFileIT {
 
 
 
 
-    @Test
-    public void javaWhiteListShouldPreventAttachYetAllowArrayList() throws TransformerConfigurationException, IOException, ClassNotFoundException, AttachNotSupportedException, AgentLoadException, AgentInitializationException {
+    @Test(expected = UnsupportedOperationException.class)
+    public void javaBlackListShouldRejectDeserialization() throws TransformerConfigurationException, IOException, ClassNotFoundException, AttachNotSupportedException, AgentLoadException, AgentInitializationException {
 
-        System.setProperty("notsoserial.whitelist", "src/test/resources/whitelist-java.txt");
+        System.setProperty("notsoserial.blacklist", "src/test/resources/blacklist-java.txt");
 
         attachAgent();
 
         byte[] ser = Files.readAllBytes(Paths.get("target").resolve("bytes.ser"));
-
-        try {
-            System.setProperty("pwned", "false");
-            // Deserializing should not flip pwned to true
-            deserialize(ser);
-        } catch (ClassCastException e) {
-            // Ignore, happens after exploit effect
-
-        } catch (UnsupportedOperationException e) {
-            // The object should not be deserializable
-        }
-        assertThat(System.getProperty("pwned"), is("false"));
 
         Queue<String> strings = (Queue<String>) deserialize(serialize(new PriorityQueue<String>(Arrays.asList("one", "two", "three"))));
     }
@@ -71,6 +57,10 @@ public class WithNonEmptyWhitelistIT {
         out.writeObject(object);
         return bout.toByteArray();
     }
+
+
+
+
 
 
     private Object deserialize(byte[] ser) throws IOException, ClassNotFoundException {
