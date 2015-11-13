@@ -48,12 +48,13 @@ public class Options {
         blacklist.add(internalName("org.codehaus.groovy.runtime.ConvertedClosure"));
         blacklist.add(internalName("com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl"));
 
-        String classes = System.getProperty("notsoserial.custom.classes");
-        if(classes != null) {
-            for (String className : classes.split(",")) {
-                className = className.trim();
-                blacklist.add(className);
+        String blacklistProperty = System.getProperty("notsoserial.blacklist");
+        if(blacklistProperty != null) {
+            File blackListFile = new File(blacklistProperty);
+            if(!blackListFile .exists()) {
+                throw new IllegalArgumentException("Blacklist file specified by 'notsoserial.blacklist' does not exist: " + blackListFile);
             }
+            blacklist.addAll(readClassesFromFile(blackListFile));
         }
 
         String whiteListProperty = System.getProperty("notsoserial.whitelist");
@@ -64,7 +65,7 @@ public class Options {
 
             }
 
-            whiteList = readWhiteList(whiteListFile);
+            whiteList = readClassesFromFile(whiteListFile);
         }
 
         String dryRunPath = System.getProperty("notsoserial.dryrun");
@@ -88,7 +89,7 @@ public class Options {
         }
     }
 
-    private Set<String> readWhiteList(File whiteListFile) {
+    private Set<String> readClassesFromFile(File whiteListFile) {
         Set<String> whitelist = new HashSet<String>();
 
         BufferedReader br = null;

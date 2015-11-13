@@ -39,10 +39,11 @@ By default, NotSoSerial rejects deserialization of the following classes:
 * org.codehaus.groovy.runtime.ConvertedClosure
 * com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl
 
-You can add your own classes to this list by passing a comma-separated list of classes as a system property:
+You can add your own classes blacklist by configuring a blacklist file like this:
 
-    -javaagent:notsoserial.jar -Dnotsoserial.custom.classes=com.example.Car,com.example.Wheel,com.example.Door
+    -javaagent:notsoserial.jar -Dnotsoserial.blacklist=my-blacklist.txt
 
+Where my-blacklist.txt is a file with one class or package per line.
 
 ## Whitelisting mode
 
