@@ -27,16 +27,13 @@ import java.io.ObjectStreamClass;
  *
  */
 public class ObjectInputStreamClassVisitor extends ClassVisitor {
-    private final String callbackMethod;
 
     private final String resolveClassDesc = "(Ljava/io/ObjectStreamClass;)Ljava/lang/Class;";
 
     private final String callBackDescriptor = "(Ljava/io/ObjectStreamClass;)Ljava/io/ObjectStreamClass;";
 
-    public ObjectInputStreamClassVisitor(ClassVisitor cv, Options options) {
+    public ObjectInputStreamClassVisitor(ClassVisitor cv) {
         super(Opcodes.ASM5, cv);
-
-        this.callbackMethod = options.isDryRun() ? "registerDeserialization" : "preventDeserialization";
     }
 
 
@@ -46,17 +43,9 @@ public class ObjectInputStreamClassVisitor extends ClassVisitor {
         return new ResolveClassCallSiteVisitor(mv);
     }
 
-    public static ObjectStreamClass registerDeserialization(ObjectStreamClass desc) {
+    public static ObjectStreamClass onBeforeResolveClass(ObjectStreamClass desc) {
         String className = desc.getName();
-        Options.getInstance().registerDeserialization(className);
-        return desc;
-    }
-
-    public static ObjectStreamClass preventDeserialization(ObjectStreamClass desc) {
-        String className = desc.getName();
-        if(Options.getInstance().shouldReject(className.replace('.', '/'))) {
-            throw new UnsupportedOperationException("Deserialization not allowed for class " + className.replace('/', '.'));
-        }
+        Options.getInstance().getNotSoSerial().onBeforeResolveClass(className);
         return desc;
     }
 
@@ -68,7 +57,7 @@ public class ObjectInputStreamClassVisitor extends ClassVisitor {
         @Override
         public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
             if (name.equals("resolveClass") && resolveClassDesc.equals(desc)) {
-                mv.visitMethodInsn(Opcodes.INVOKESTATIC, Type.getType(ObjectInputStreamClassVisitor.class).getInternalName(), callbackMethod, callBackDescriptor, false);
+                mv.visitMethodInsn(Opcodes.INVOKESTATIC, Type.getType(ObjectInputStreamClassVisitor.class).getInternalName(), "onBeforeResolveClass", callBackDescriptor, false);
             }
             super.visitMethodInsn(opcode, owner, name, desc, itf);
         }

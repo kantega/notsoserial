@@ -42,9 +42,9 @@ public class NotSoSerialAgent {
         // Needs to happen early, before any classes we need to load from the bootstrap class loader
         injectBootstrapClasspath(instrumentation);
 
-        Options options = Options.getInstance();
+        Options options = Options.makeInstance(NotSoSerialAgent.class.getClassLoader());
 
-        NotSoSerialClassFileTransformer transformer = new NotSoSerialClassFileTransformer(options);
+        NotSoSerialClassFileTransformer transformer = new NotSoSerialClassFileTransformer();
 
         instrumentation.addTransformer(transformer, true);
 
