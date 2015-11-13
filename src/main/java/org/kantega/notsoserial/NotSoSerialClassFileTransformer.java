@@ -28,11 +28,17 @@ import java.security.ProtectionDomain;
  */
 public class NotSoSerialClassFileTransformer implements ClassFileTransformer {
 
+    private final Options options;
+
+    public NotSoSerialClassFileTransformer(Options options) {
+        this.options = options;
+    }
+
     public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
         if(isObjectInputStream(className))  {
             ClassReader reader = new ClassReader(classfileBuffer);
             ClassWriter writer = new ClassWriter(0);
-            ObjectInputStreamClassVisitor classVisitor = new ObjectInputStreamClassVisitor(writer);
+            ObjectInputStreamClassVisitor classVisitor = new ObjectInputStreamClassVisitor(writer, options);
             reader.accept(classVisitor, 0);
             return writer.toByteArray();
         }

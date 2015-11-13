@@ -33,9 +33,9 @@ public class ObjectInputStreamClassVisitor extends ClassVisitor {
 
     private final String callBackDescriptor = "(Ljava/io/ObjectStreamClass;)Ljava/io/ObjectStreamClass;";
 
-    public ObjectInputStreamClassVisitor(ClassVisitor cv) {
+    public ObjectInputStreamClassVisitor(ClassVisitor cv, Options options) {
         super(Opcodes.ASM5, cv);
-        Options options = Options.getInstance();
+
         this.callbackMethod = options.isDryRun() ? "registerDeserialization" : "preventDeserialization";
     }
 

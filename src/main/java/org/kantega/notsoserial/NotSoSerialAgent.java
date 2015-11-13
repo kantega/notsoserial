@@ -39,10 +39,14 @@ public class NotSoSerialAgent {
 
     private static void addTransformer(Instrumentation instrumentation) {
 
-
+        // Needs to happen early, before any classes we need to load from the bootstrap class loader
         injectBootstrapClasspath(instrumentation);
 
-        instrumentation.addTransformer(new NotSoSerialClassFileTransformer(), true);
+        Options options = Options.getInstance();
+
+        NotSoSerialClassFileTransformer transformer = new NotSoSerialClassFileTransformer(options);
+
+        instrumentation.addTransformer(transformer, true);
 
         for (Class clazz : instrumentation.getAllLoadedClasses()) {
             if("java.io.ObjectInputStream".equals(clazz.getName())) {
