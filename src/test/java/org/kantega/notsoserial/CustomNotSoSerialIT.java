@@ -47,7 +47,7 @@ public class CustomNotSoSerialIT {
     @Before
     public void before() throws IOException, URISyntaxException {
         URL resource = getClass().getResource("/META-INF/services/org.kantega.notsoserial.NotSoSerial");
-        servicesPath = Paths.get(resource.toURI().getPath());
+        servicesPath = Paths.get(resource.toURI());
         Files.write(servicesPath, (getClass().getPackage().getName() +".CustomNotSoSerial").getBytes());
     }
 
