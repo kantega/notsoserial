@@ -1,6 +1,8 @@
 NotSoSerial
 ================
 
+[![Build Status](https://travis-ci.org/kantega/notsoserial.svg)](https://travis-ci.org/kantega/notsoserial)
+
 NotSoSerial is a Java Agent designed as a mitigation effort against deserialization attacks.
 
 Think of it as a "deserialization firewall". It gives you complete control over which classes your application should be allowed to deserialize.
