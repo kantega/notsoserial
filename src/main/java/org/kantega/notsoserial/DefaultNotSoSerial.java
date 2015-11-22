@@ -27,7 +27,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
  */
 public class DefaultNotSoSerial implements NotSoSerial {
 
-    private  final Set<String> blacklist = new HashSet<String>();
+    private final Set<String> blacklist = new HashSet<String>();
 
     private Set<String> whiteList = null;
 
@@ -48,7 +48,7 @@ public class DefaultNotSoSerial implements NotSoSerial {
         String blacklistProperty = System.getProperty("notsoserial.blacklist");
         if(blacklistProperty != null) {
             File blackListFile = new File(blacklistProperty);
-            if(!blackListFile .exists()) {
+            if(!blackListFile.exists()) {
                 throw new IllegalArgumentException("Blacklist file specified by 'notsoserial.blacklist' does not exist: " + blackListFile);
             }
             blacklist.addAll(readClassesFromFile(blackListFile));
@@ -67,22 +67,21 @@ public class DefaultNotSoSerial implements NotSoSerial {
 
         String dryRunPath = System.getProperty("notsoserial.dryrun");
         if(dryRunPath != null) {
-            File dryRunFile = new File(dryRunPath);
-            try {
-                dryRunWriter = new PrintWriter(new FileWriter(dryRunFile));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            dryRunWriter = openWriter(dryRunPath);
         }
 
         String tracePath = System.getProperty("notsoserial.trace");
         if(tracePath != null) {
-            File traceFile = new File(tracePath);
-            try {
-                traceWriter = new PrintWriter(new FileWriter(traceFile));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            traceWriter = openWriter(tracePath);
+        }
+    }
+
+    private PrintWriter openWriter(String path) {
+        File file = new File(path);
+        try {
+             return new PrintWriter(new FileWriter(file));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -146,14 +145,9 @@ public class DefaultNotSoSerial implements NotSoSerial {
         return false;
     }
 
-
     private boolean isDryRun() {
         return dryRunWriter != null;
     }
-
-
-
-
 
     private void registerDeserialization(String className) {
         if(!deserializingClasses.contains(className)) {
