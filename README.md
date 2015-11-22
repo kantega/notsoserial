@@ -11,7 +11,7 @@ See http://foxglovesecurity.com/2015/11/06/what-do-weblogic-websphere-jboss-jenk
 
 ## How does it work?
  
-NotSoSerial makes some well known vulnerable classes effectively non-deserializable by preventing them to load.
+NotSoSerial makes some well known vulnerable classes effectively non-deserializable by preventing them from loading.
 
 It does so by adding a check just before the call to ObjectInputStream.resolveClass. If the class is not allowed, an UnsupportedOperationException is called instead of calling resolveClass.
 
@@ -29,7 +29,7 @@ Copy this as notsoserial.jar to your application, and add the following paramete
 
     -javaagent:notsoserial.jar
 
-> PLEASE NOTE: In this mode, NotSoSerial only does blocks a few known vulnerabilities. It does not fix the problem with deserialization attacks. It only knowns about some well known classes for which it rejects deserialization. See below how you can whitelist or completely reject any objects to be deserialized.
+> PLEASE NOTE: In this mode, NotSoSerial only blocks a few known vulnerabilities. It does not fix the problem with deserialization attacks. It only knows about some well known classes for which it rejects deserialization. See below how you can whitelist or completely reject any objects to be deserialized.
 
 
 ## Which classes are rejected?
@@ -37,7 +37,9 @@ Copy this as notsoserial.jar to your application, and add the following paramete
 By default, NotSoSerial rejects deserialization of the following classes:
 
 * org.apache.commons.collections.functors.InvokerTransformer
+* org.apache.commons.collections.functors.InstantiateTransformer
 * org.apache.commons.collections4.functors.InvokerTransformer
+* org.apache.commons.collections4.functors.InstantiateTransformer
 * org.codehaus.groovy.runtime.ConvertedClosure
 * com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl
 
@@ -77,13 +79,13 @@ Just use an empty whitelist. Preliminary testing with a non-trivial Java applica
 
 ## Tracing deserialization
 
-You might be interested not just in which classes your application deserialize, but also where in your code deserialization happens.
+You might be interested not just in which classes your application deserializes, but also where in your code deserialization happens.
 
 This can be enabled by using the 'trace' option, like the following:
 
      -javaagent:notsoserial.jar -Dnotsoserial.whitelist=empty.txt -Dnotsoserial.dryrun=is-deserialized.txt -Dnotsoserial.trace=deserialize-trace.txt
 
- This will produce a file deserialize-trace.txt looking something like this:
+This will produce a file deserialize-trace.txt that looks something like this:
 
     Deserialization of class java.util.PriorityQueue (on Mon Nov 09 19:34:26 CET 2015)
              at org.kantega.notsoserial.WithDryRunWhitelistAndTraceIT.deserialize
