@@ -43,6 +43,8 @@ public class DefaultNotSoSerial implements NotSoSerial {
         blacklist.add(internalName("org.apache.commons.collections.functors.InstantiateTransformer"));
         blacklist.add(internalName("org.apache.commons.collections4.functors.InstantiateTransformer"));
         blacklist.add(internalName("org.codehaus.groovy.runtime.ConvertedClosure"));
+        blacklist.add(internalName("org.codehaus.groovy.runtime.MethodClosure"));
+        blacklist.add(internalName("org.springframework.beans.factory.ObjectFactory"));
         blacklist.add(internalName("com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl"));
 
         String blacklistProperty = System.getProperty("notsoserial.blacklist");
