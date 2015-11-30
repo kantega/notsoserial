@@ -45,7 +45,7 @@ public class DefaultNotSoSerial implements NotSoSerial {
         blacklist.add(internalName("org.codehaus.groovy.runtime.ConvertedClosure"));
         blacklist.add(internalName("org.codehaus.groovy.runtime.MethodClosure"));
         blacklist.add(internalName("org.springframework.beans.factory.ObjectFactory"));
-        blacklist.add(internalName("org.springframework.core.SerializableTypeWrapper"));
+        blacklist.add(internalName("org.springframework.core.SerializableTypeWrapper$MethodInvokeTypeProvider"));
         blacklist.add(internalName("com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl"));
         blacklist.add(internalName("org.apache.xalan.internal.xsltc.trax.TemplatesImpl"));
 
