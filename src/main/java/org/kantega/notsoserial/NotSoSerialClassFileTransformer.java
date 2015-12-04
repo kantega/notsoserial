@@ -36,11 +36,22 @@ public class NotSoSerialClassFileTransformer implements ClassFileTransformer {
             reader.accept(classVisitor, 0);
             return writer.toByteArray();
         }
+        if (isAbstractClassResolver(className)) {
+            ClassReader reader = new ClassReader(classfileBuffer);
+            ClassWriter writer = new ClassWriter(0);
+            AbstractClassResolverClassVisitor classVisitor = new AbstractClassResolverClassVisitor(writer);
+            reader.accept(classVisitor, 0);
+            return writer.toByteArray();
+        }
         return null;
     }
 
     private boolean isObjectInputStream(String className) {
         return "java/io/ObjectInputStream".equals(className);
+    }
+
+    private boolean isAbstractClassResolver(String className) {
+        return "org/jboss/marshalling/AbstractClassResolver".equals(className);
     }
 
 }
