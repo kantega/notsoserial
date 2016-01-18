@@ -26,13 +26,13 @@ import org.objectweb.asm.Type;
  * 
  * This class supports version 1.2 up to 1.4.10 of Jboss Marshalling and can be used for both Jboss AS and Wildfly.
  */
-public class AbstractClassResolverClassVisitor extends ClassVisitor {
+public class JbossAbstractClassResolverClassVisitor extends ClassVisitor {
 
     private final String loadClassDesc = "(Ljava/lang/String;)Ljava/lang/Class;";
 
     private final String callBackDescriptor = "(Ljava/lang/String;)V";
 
-    public AbstractClassResolverClassVisitor(ClassVisitor cv) {
+    public JbossAbstractClassResolverClassVisitor(ClassVisitor cv) {
         super(Opcodes.ASM5, cv);
     }
 
@@ -54,7 +54,7 @@ public class AbstractClassResolverClassVisitor extends ClassVisitor {
         
         public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
             if (name.equals("loadClass") && loadClassDesc.equals(desc)) {
-                mv.visitMethodInsn(Opcodes.INVOKESTATIC, Type.getType(AbstractClassResolverClassVisitor.class).getInternalName(), "onBeforeLoadClass", callBackDescriptor, false);
+                mv.visitMethodInsn(Opcodes.INVOKESTATIC, Type.getType(JbossAbstractClassResolverClassVisitor.class).getInternalName(), "onBeforeLoadClass", callBackDescriptor, false);
             }
             super.visitMethodInsn(opcode, owner, name, desc, itf);
         }
