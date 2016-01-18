@@ -56,6 +56,13 @@ public class NotSoSerialAgent {
                     throw new RuntimeException("Could not retransform class " + clazz.getName(), e);
                 }
             }
+            if("org.jboss.marshalling.AbstractClassResolver".equals(clazz.getName())) {
+                try {
+                    instrumentation.retransformClasses(clazz);
+                } catch (UnmodifiableClassException e) {
+                    throw new RuntimeException("Could not retransform class " + clazz.getName(), e);
+                }
+            }
         }
     }
 
