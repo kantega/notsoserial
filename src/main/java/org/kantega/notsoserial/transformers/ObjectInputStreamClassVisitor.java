@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package org.kantega.notsoserial;
+package org.kantega.notsoserial.transformers;
 
+import org.kantega.notsoserial.Options;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;

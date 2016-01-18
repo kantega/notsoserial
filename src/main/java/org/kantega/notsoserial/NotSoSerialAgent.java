@@ -44,16 +44,20 @@ public class NotSoSerialAgent {
 
         Options options = Options.makeInstance(NotSoSerialAgent.class.getClassLoader());
 
-        NotSoSerialClassFileTransformer transformer = new NotSoSerialClassFileTransformer();
+
+
+        NotSoSerialClassFileTransformer transformer = new NotSoSerialClassFileTransformer(options);
 
         instrumentation.addTransformer(transformer, true);
 
         for (Class clazz : instrumentation.getAllLoadedClasses()) {
-            if("java.io.ObjectInputStream".equals(clazz.getName())) {
-                try {
-                    instrumentation.retransformClasses(clazz);
-                } catch (UnmodifiableClassException e) {
-                    throw new RuntimeException("Could not retransform class " + clazz.getName(), e);
+            for(NotSoSerialTransformer nsst : options.getNotSoSerialTransformers()) {
+                if(nsst.shouldRetransform(clazz)) {
+                    try {
+                        instrumentation.retransformClasses(clazz);
+                    } catch (UnmodifiableClassException e) {
+                        throw new RuntimeException("Could not retransform class " + clazz.getName(), e);
+                    }
                 }
             }
         }

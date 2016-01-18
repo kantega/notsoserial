@@ -16,7 +16,9 @@
 
 package org.kantega.notsoserial;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.ServiceLoader;
 
 /**
@@ -28,6 +30,7 @@ public class Options {
     private static Options instance;
 
     private final NotSoSerial notSoSerial;
+    private final List<NotSoSerialTransformer> notSoSerialTransformers;
 
 
     public Options(ClassLoader classLoader) {
@@ -49,6 +52,12 @@ public class Options {
         }
 
         this.notSoSerial = notSoSerial;
+
+        this.notSoSerialTransformers = new ArrayList<NotSoSerialTransformer>();
+
+        for(NotSoSerialTransformer trans : ServiceLoader.load(NotSoSerialTransformer.class, classLoader)) {
+            notSoSerialTransformers.add(trans);
+        }
     }
 
     public static Options getInstance() {
@@ -61,5 +70,9 @@ public class Options {
 
     public static Options makeInstance(ClassLoader classLoader) {
         return instance = new Options(classLoader);
+    }
+
+    public List<NotSoSerialTransformer> getNotSoSerialTransformers() {
+        return notSoSerialTransformers;
     }
 }
