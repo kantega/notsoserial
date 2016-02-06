@@ -29,6 +29,12 @@ import java.util.jar.JarFile;
  */
 public class NotSoSerialAgent {
 
+    private static boolean loaded = false;
+
+    public static boolean isLoaded() {
+        return loaded;
+    }
+    
     public static void premain(String options, Instrumentation instrumentation) throws Exception {
         addTransformer(instrumentation);
     }
@@ -38,7 +44,9 @@ public class NotSoSerialAgent {
     }
 
     private static void addTransformer(Instrumentation instrumentation) {
-
+        if(loaded) {
+            return;
+        }
         // Needs to happen early, before any classes we need to load from the bootstrap class loader
         injectBootstrapClasspath(instrumentation);
 
@@ -61,6 +69,7 @@ public class NotSoSerialAgent {
                 }
             }
         }
+        loaded = true;
     }
 
     private static void injectBootstrapClasspath(Instrumentation instrumentation) {

@@ -43,7 +43,9 @@ By default, NotSoSerial rejects deserialization of the following classes:
 * org.codehaus.groovy.runtime.ConvertedClosure
 * org.codehaus.groovy.runtime.MethodClosure
 * org.springframework.beans.factory.ObjectFactory
+* org.springframework.core.SerializableTypeWrapper$MethodInvokeTypeProvider
 * com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl
+* org.apache.xalan.internal.xsltc.trax.TemplatesImpl
 
 You can add your own classes blacklist by configuring a blacklist file like this:
 

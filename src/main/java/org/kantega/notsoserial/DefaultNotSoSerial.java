@@ -16,24 +16,36 @@
 
 package org.kantega.notsoserial;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.PrintWriter;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
+
+import javax.annotation.Nonnull;
 
 /**
  *
  */
 public class DefaultNotSoSerial implements NotSoSerial {
 
-    private final Set<String> blacklist = new HashSet<String>();
+    private Set<String> blacklist = new HashSet<String>();
 
-    private Set<String> whiteList = null;
+    private Set<String> whiteList = new HashSet<String>();
 
-    private PrintWriter dryRunWriter = null;
+    private boolean dryRun = false;
+    
+    //Volatile as the act of setting them closes the previous class.
+    private volatile PrintWriter detailWriter = null;
 
-    private PrintWriter traceWriter = null;
+    //Volatile as the act of setting them closes the previous class.
+    private volatile PrintWriter traceWriter = null;
 
     private Set<String> deserializingClasses = new ConcurrentSkipListSet<String>();
 
@@ -45,7 +57,9 @@ public class DefaultNotSoSerial implements NotSoSerial {
         blacklist.add(internalName("org.codehaus.groovy.runtime.ConvertedClosure"));
         blacklist.add(internalName("org.codehaus.groovy.runtime.MethodClosure"));
         blacklist.add(internalName("org.springframework.beans.factory.ObjectFactory"));
+        blacklist.add(internalName("org.springframework.core.SerializableTypeWrapper$MethodInvokeTypeProvider"));
         blacklist.add(internalName("com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl"));
+        blacklist.add(internalName("org.apache.xalan.internal.xsltc.trax.TemplatesImpl"));
 
         String blacklistProperty = System.getProperty("notsoserial.blacklist");
         if(blacklistProperty != null) {
@@ -64,12 +78,13 @@ public class DefaultNotSoSerial implements NotSoSerial {
 
             }
 
-            whiteList = readClassesFromFile(whiteListFile);
+            whiteList.addAll(readClassesFromFile(whiteListFile));
         }
 
         String dryRunPath = System.getProperty("notsoserial.dryrun");
         if(dryRunPath != null) {
-            dryRunWriter = openWriter(dryRunPath);
+            dryRun = true;
+            detailWriter = openWriter(dryRunPath);
         }
 
         String tracePath = System.getProperty("notsoserial.trace");
@@ -77,7 +92,48 @@ public class DefaultNotSoSerial implements NotSoSerial {
             traceWriter = openWriter(tracePath);
         }
     }
+    
+    public void setDetailWriter(PrintWriter dryRunWriter) {
+        PrintWriter previous = this.detailWriter;
+        this.detailWriter = detailWriter;
+        
+        if(previous != null) {
+            previous.close();
+        }
+    }
 
+    public void setTraceWriter(PrintWriter traceWriter) {
+        PrintWriter previous = this.traceWriter;
+        this.traceWriter = traceWriter;
+        
+        if(previous != null) {
+            previous.close();
+        }
+    }
+    
+    public void setWhiteList(@Nonnull Set<String> whitelist) {
+        if(whitelist == null) {
+            throw new IllegalArgumentException("Null whitelist not supported");
+        }
+        
+        this.whiteList = convertExternalToInternalSet(whitelist);
+    }
+    
+    public void setBlackList(@Nonnull Set<String> blacklist) {
+        if(blacklist == null) {
+            throw new IllegalArgumentException("Null blacklist not supported");
+        }
+        this.blacklist = convertExternalToInternalSet(blacklist);
+    }
+    
+    private Set<String> convertExternalToInternalSet(@Nonnull Set<String> externalSet) {
+        Set<String> internalSet = new HashSet<String>(externalSet.size());
+        for(String entry : externalSet) {
+            internalSet.add(internalName(entry));
+        }
+        return internalSet;
+    }
+    
     private PrintWriter openWriter(String path) {
         File file = new File(path);
         try {
@@ -87,25 +143,24 @@ public class DefaultNotSoSerial implements NotSoSerial {
         }
     }
 
-    private Set<String> readClassesFromFile(File whiteListFile) {
-        Set<String> whitelist = new HashSet<String>();
+    private Set<String> readClassesFromFile(File file) {
+        Set<String> list = new HashSet<String>();
 
         BufferedReader br = null;
         try {
-            br = new BufferedReader(new FileReader(whiteListFile));
+            br = new BufferedReader(new FileReader(file));
             String line;
 
-            whiteList = new HashSet<String>();
             while((line = br.readLine()) != null) {
                 line = line.trim();
                 if(!line.isEmpty()) {
-                    whitelist.add(internalName(line));
+                    list.add(internalName(line));
                 }
             }
 
-            return whitelist;
+            return list;
         } catch (IOException e) {
-            throw new RuntimeException("Could not read white list file "+ whiteListFile);
+            throw new RuntimeException("Could not read white list file "+ file);
         } finally {
             if(br != null) {
                 try {
@@ -127,10 +182,13 @@ public class DefaultNotSoSerial implements NotSoSerial {
             return true;
         }
 
-        return whiteList != null && !isWhitelisted(className, whiteList);
+        return !isWhitelisted(className, whiteList);
     }
 
     private boolean isWhitelisted(String className, Set<String> whiteList) {
+        if(whiteList.isEmpty()) {
+            return true;
+        }
         return isPrefixMatch(className, whiteList);
     }
 
@@ -139,41 +197,52 @@ public class DefaultNotSoSerial implements NotSoSerial {
     }
 
     private boolean isPrefixMatch(String className, Set<String> whiteList) {
-        for (String prefix : whiteList) {
-            if(className.startsWith(prefix)) {
-                return true;
+        synchronized(whiteList) {
+            for (String prefix : whiteList) {
+                if(className.startsWith(prefix)) {
+                    return true;
+                }
             }
         }
         return false;
-    }
-
-    private boolean isDryRun() {
-        return dryRunWriter != null;
     }
 
     private void registerDeserialization(String className) {
         if(!deserializingClasses.contains(className)) {
             deserializingClasses.add(className);
             String prettyName = className.replace('/', '.');
-            dryRunWriter.println(prettyName);
-            dryRunWriter.flush();
+    
             if(traceWriter != null) {
-                traceWriter.println("Deserialization of class " + prettyName +" (on " + new Date().toString() +")");
-                boolean foundReadObject = false;
-                for (StackTraceElement element : Thread.currentThread().getStackTrace()) {
-                    if(foundReadObject) {
-                        traceWriter.println("\t at " + element.getClassName() +"." + element.getMethodName());
-                    } else if (element.getClassName().equals(ObjectInputStream.class.getName())
-                            && element.getMethodName().equals("readObject")) {
-                        foundReadObject = true;
-                    }
-                }
+                traceDeserializationStack("Deserialization of class " + prettyName +" (on " + new Date().toString() +")");
+            }
+            if(detailWriter != null) {
+                detailWriter.println("Deserialization of class " + prettyName);
+                detailWriter.flush();
             }
         }
     }
 
+    private void traceDeserializationStack(String msg) {
+        if(traceWriter == null) {
+            return;
+        }
+        StringBuilder sb = msg != null ? new StringBuilder(msg + "\n") : new StringBuilder();
+        boolean foundReadObject = false;
+        for (StackTraceElement element : Thread.currentThread().getStackTrace()) {
+            if(foundReadObject) {
+                sb.append("\t at " + element.getClassName() +"." + element.getMethodName() +"\n");
+            } else if (element.getClassName().equals(ObjectInputStream.class.getName())
+                    && element.getMethodName().equals("readObject")) {
+                foundReadObject = true;
+            }
+        }
+        String result = sb.toString().trim();
+        traceWriter.println(result); //print entire message simultaneously.
+        traceWriter.flush();
+    }
+
     public void onBeforeResolveClass(String className) {
-        if(isDryRun()) {
+        if(dryRun) {
             registerDeserialization(className);
         } else {
             preventDeserialization(className);
@@ -182,7 +251,12 @@ public class DefaultNotSoSerial implements NotSoSerial {
 
     private void preventDeserialization(String className) {
         if(shouldReject(className.replace('.', '/'))) {
-            throw new UnsupportedOperationException("Deserialization not allowed for class " + className.replace('/', '.'));
+            String msg = "Deserialization not allowed for class " + className.replace('/', '.') +" (on " + new Date().toString() +")";
+            traceDeserializationStack(msg);
+            throw new UnsupportedOperationException(msg);
+        }
+        else {
+            registerDeserialization(className);
         }
     }
 }
