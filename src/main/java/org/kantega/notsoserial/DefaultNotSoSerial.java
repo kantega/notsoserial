@@ -87,25 +87,25 @@ public class DefaultNotSoSerial implements NotSoSerial {
         }
     }
 
-    private Set<String> readClassesFromFile(File whiteListFile) {
-        Set<String> whitelist = new HashSet<String>();
+    private Set<String> readClassesFromFile(File listFile) {
+        Set<String> list = new HashSet<String>();
 
         BufferedReader br = null;
         try {
-            br = new BufferedReader(new FileReader(whiteListFile));
+            br = new BufferedReader(new FileReader(listFile));
             String line;
 
-            whiteList = new HashSet<String>();
+            list = new HashSet<String>();
             while((line = br.readLine()) != null) {
                 line = line.trim();
                 if(!line.isEmpty()) {
-                    whitelist.add(internalName(line));
+                	list.add(internalName(line));
                 }
             }
 
-            return whitelist;
+            return list;
         } catch (IOException e) {
-            throw new RuntimeException("Could not read white list file "+ whiteListFile);
+            throw new RuntimeException("Could not read white list file "+ listFile);
         } finally {
             if(br != null) {
                 try {
@@ -182,7 +182,8 @@ public class DefaultNotSoSerial implements NotSoSerial {
 
     private void preventDeserialization(String className) {
         if(shouldReject(className.replace('.', '/'))) {
-            throw new UnsupportedOperationException("Deserialization not allowed for class " + className.replace('/', '.'));
+            throw new UnsupportedOperationException(
+            		"Deserialization not allowed for class " + className.replace('/', '.') + " blacklist = " + this.blacklist + " and whitelist = " + this.whiteList );
         }
     }
 }
