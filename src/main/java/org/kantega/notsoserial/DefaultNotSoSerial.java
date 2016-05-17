@@ -183,7 +183,8 @@ public class DefaultNotSoSerial implements NotSoSerial {
     private void preventDeserialization(String className) {
         if(shouldReject(className.replace('.', '/'))) {
             throw new UnsupportedOperationException(
-            		"Deserialization not allowed for class " + className.replace('/', '.') + " blacklist = " + this.blacklist + " and whitelist = " + this.whiteList );
-        }
+            		"Deserialization not allowed for class " + className.replace('/', '.')
+            );
+           }
     }
 }
